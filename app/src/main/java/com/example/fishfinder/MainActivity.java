@@ -11,9 +11,9 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     //Components
-    private EditText edtSearch;
-    private TextView tvGoogleMap;
-    private Button   btnGoToFish;
+
+    private TextView tvFishInfo;
+    private Button   btnCaughtFish;
 
 
     @Override
@@ -21,14 +21,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        edtSearch   = findViewById(R.id.edtSearch);
-        tvGoogleMap = findViewById(R.id.tvGoogleMap);
-        btnGoToFish = findViewById(R.id.btnGoToFish);
 
-        btnGoToFish.setOnClickListener(new View.OnClickListener() {
+        tvFishInfo = findViewById(R.id.tvFishInfo);
+        btnCaughtFish = findViewById(R.id.btnCaughtFish);
+
+        btnCaughtFish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // WE GO TO BAROMETER WEATHER....
+                // WE GO TO SAVE TO PROFILE PAGE....
 
 
             }
