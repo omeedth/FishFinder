@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">FishFinder</string>
+    <string name="username">username</string>
+    <string name="password">password</string>
+    <string name="sign_in">sign_in</string>
+    <string name="sign_in_with_oauth">sign_in_with_oauth</string>
+    <string name="welcome_to_fish_app">welcome_to_fish_app</string>
 </resources>
