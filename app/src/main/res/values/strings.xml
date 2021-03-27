@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">FishFinder</string>
+    <string name="go_to_fish">GO TO FISH</string>
+    <string name="textview"></string>
 </resources>
