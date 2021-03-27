@@ -1,32 +1,27 @@
 package com.example.fishfinder;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.net.ssl.HandshakeCompletedListener;
-
-public class MainActivity extends AppCompatActivity {
+public class SearchForFishActivity extends AppCompatActivity {
 
     //Components
     private EditText        edtSearch;
@@ -40,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_search_for_fish);
 
         edtSearch   = findViewById(R.id.edtSearch);
         tvGoogleMap = findViewById(R.id.tvGoogleMap);
@@ -150,6 +145,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return buffer.toString();
     }
-
 
 }

@@ -1,5 +1,24 @@
 <resources>
     <string name="app_name">FishFinder</string>
-    <string name="go_to_fish">GO TO FISH</string>
-    <string name="textview"></string>
+    <!--  Register Page  -->
+    <string name="sign_up">Sign Up</string>
+    <string name="email">Email</string>
+    <string name="username">Username</string>
+    <string name="user_name">User Name</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <!--  Login Page  -->
+    <string name="sign_in">sign_in</string>
+    <string name="sign_in_with_oauth">sign_in_with_oauth</string>
+    <string name="welcome_to_fish_app">welcome_to_fish_app</string>
+    <!-- Main Page -->
+    <string name="main_page">Main Page</string>
+    <string name="go_to_profile">Go To Profile</string>
+    <string name="logout">Logout</string>
+    <string name="search_for_fish">Search For Fish</string>
+    <!-- Search For Fish Page -->
+    <string name="go_to_fish">Go To Fish</string>
+    <string name="textview">Google Maps</string>
+    <!-- Fish Info Page -->
+    <string name="i_caught_fish">I Caught The Fish!</string>
 </resources>
