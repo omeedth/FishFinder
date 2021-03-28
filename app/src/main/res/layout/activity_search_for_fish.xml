@@ -5,37 +5,64 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D1E6F6"
-    tools:context=".SearchForFishActivity">
+    tools:context=".MainActivity">
 
     <EditText
         android:id="@+id/edtSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="66dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="54dp"
         android:ems="10"
+        android:hint="Genus, Species, State"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/lat_long_container"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvGoogleMap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="163dp"
-        android:layout_marginTop="304dp"
+    <LinearLayout
+        android:id="@+id/lat_long_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="40dp"
         android:text="@string/textview"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/btnGoToFish"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.593"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/edtSearch">
+
+        <TextView
+            android:id="@+id/lat_long_title"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:text="Latitude           Longitude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tvGoogleMap"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            tools:text="Demo" />
+    </LinearLayout>
+
 
     <Button
         android:id="@+id/btnGoToFish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="216dp"
+        android:layout_marginBottom="126dp"
         android:text="@string/go_to_fish"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.471"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lat_long_container" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
