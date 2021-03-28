@@ -7,23 +7,35 @@
     android:background="#D1E6F6"
     tools:context=".FishInfoActivity">
 
-    <TextView
-        android:id="@+id/tvFishInfo"
+    <ListView
+        android:id="@+id/ListViewFishInfo"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextSearchFish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="161dp"
-        android:layout_marginTop="144dp"
-        android:text="@string/textview"
+        android:ems="10"
+        android:hint="Species"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSearchForFish"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.774" />
 
     <Button
-        android:id="@+id/btnCaughtFish"
+        android:id="@+id/buttonSearchForFish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="298dp"
-        android:text="@string/i_caught_fish"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="52dp"
+        android:text="Search For Fish"
+        app:layout_constraintBottom_toTopOf="@+id/ListViewFishInfo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

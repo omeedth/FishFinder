@@ -1,5 +1,6 @@
 package com.example.fishfinder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -16,8 +17,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,6 +30,8 @@ public class SearchForFishActivity extends AppCompatActivity {
     private EditText        edtSearch;
     private TextView        tvGoogleMap;
     private Button          btnGoToFish;
+
+    // NAS API (Find coordinates of fish)
     private final String    APIBase = "https://nas.er.usgs.gov/api/v2/occurrence/search?";
 
     private String apiResult = "";
@@ -46,8 +51,10 @@ public class SearchForFishActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                // Call NAS API (Finds Locations of Fish)
                 String name = edtSearch.getText().toString();
                 getCordinates(name);
+
             }
         });
     }
