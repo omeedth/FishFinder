@@ -1,16 +1,17 @@
 package com.example.fishfinder;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,15 +28,18 @@ public class FishInfoActivity extends AppCompatActivity {
 
     /* Variables */
     private String speciesEntered = "";
+    private Context ctx;
 
     // FishBase API
     private final String    FishBaseAPIBase = "https://fishbase.ropensci.org/";
-    private final String    FishBaseSpeciesSearch = "species?Species=";
+    private final String    FishBaseAPISpecies = "species?";
+    private final String    FishBaseSpeciesSearch = "Species=";
+    private final String    FishBaseFBNameSearch = "FBname=";
 
     /* Components */
     private EditText editTextSearchFish;
     private Button buttonSearchForFish;
-    private ListView ListViewFishInfo;
+    private ListView listViewFishInfo;
 
     ExecutorService service = Executors.newFixedThreadPool(1);
     @Override
@@ -43,8 +47,11 @@ public class FishInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fish_info);
 
+        /* Initialize Variables */
+        ctx = this.getBaseContext();
+
         /* Initializing Components */
-        ListViewFishInfo = (ListView) findViewById(R.id.ListViewFishInfo);
+        listViewFishInfo = (ListView) findViewById(R.id.listViewFishInfo);
         editTextSearchFish = (EditText) findViewById(R.id.editTextSearchFish);
         buttonSearchForFish = (Button) findViewById(R.id.buttonSearchForFish);
 
@@ -66,9 +73,22 @@ public class FishInfoActivity extends AppCompatActivity {
             }
         });
 
+        listViewFishInfo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                FishInfo fishInfo = (FishInfo) parent.getItemAtPosition(position);
+
+                Intent goToSearchForFishActivity = new Intent(view.getContext(), SearchForFishActivity.class);
+                goToSearchForFishActivity.putExtra("species", fishInfo.getSpecies());
+
+                //based on item add info to intent
+                startActivity(goToSearchForFishActivity);
+            }
+        });
+
     }
 
-    private String cleanSpeciesSearch(String inputString) {
+    public static String cleanSpeciesSearch(String inputString) {
 
         final String DEFAULT_VALUE = "";
 
@@ -96,7 +116,7 @@ public class FishInfoActivity extends AppCompatActivity {
         return cleanString;
     }
 
-    private String fetchFishBase(String urlString){
+    private String fetchFishBase(String urlString) {
         service.execute(new Runnable() {
             @Override
             public void run() {
@@ -122,6 +142,8 @@ public class FishInfoActivity extends AppCompatActivity {
                         public void run() {
 
                             /* Fill The List View */
+                            FishInfoAdapter fishInfoAdapter = new FishInfoAdapter(ctx, R.layout.list_view_fish_info, fishInfoList);
+                            listViewFishInfo.setAdapter(fishInfoAdapter);
 
                             System.out.println("FishInfo: " + fishInfoList);
                         }
@@ -149,6 +171,7 @@ public class FishInfoActivity extends AppCompatActivity {
 
                 // Fill FishInfo Object based on JSON
                 JSONObject element   = results.getJSONObject(i);
+                fishInfo.setSpecies(element.getString("Species"));
                 fishInfo.setFBname(element.getString("FBname"));
                 fishInfo.setBodyShapeI(element.getString("BodyShapeI"));
 
@@ -186,119 +209,10 @@ public class FishInfoActivity extends AppCompatActivity {
     private void getFishInfo(String species) {
 
         /* Fetch API Call from Fishbase API */
-        String completeAPICall = FishBaseAPIBase + FishBaseSpeciesSearch + species;
+        String completeAPICall = FishBaseAPIBase + FishBaseAPISpecies + FishBaseSpeciesSearch + species;
         System.out.println("API Call: " + completeAPICall);
         fetchFishBase(completeAPICall);
 
-    }
-
-    private class FishInfo {
-
-        /* Variables - (Variable names are same as JSON keys) */
-        private String FBname;
-        private String BodyShapeI;
-        private Double Length;
-        private Double Weight;
-        private String image;
-        private String Dangerous;
-        private String Comments;
-        private boolean Fresh;
-        private boolean Saltwater;
-
-        /* Constructor - TODO: Possibly make default values null */
-        FishInfo() {
-            FBname = "";
-            BodyShapeI = "";
-            Length = null;
-            Weight = null;
-            image = "";
-            Dangerous = "";
-            Comments = "";
-        }
-
-        /* Accessor Methods */
-
-        public String getFBname() {
-            return FBname;
-        }
-
-        public Double getLength() {
-            return Length;
-        }
-
-        public String getBodyShapeI() {
-            return BodyShapeI;
-        }
-
-        public Double getWeight() {
-            return Weight;
-        }
-
-        public String getImage() {
-            return image;
-        }
-
-        public String getComments() {
-            return Comments;
-        }
-
-        public String getDangerous() {
-            return Dangerous;
-        }
-
-        public boolean isFresh() {
-            return Fresh;
-        }
-
-        public boolean isSaltwater() {
-            return Saltwater;
-        }
-
-        /* Mutator Methods */
-
-        public void setFBname(String FBname) {
-            this.FBname = FBname;
-        }
-
-        public void setBodyShapeI(String bodyShapeI) {
-            BodyShapeI = bodyShapeI;
-        }
-
-        public void setImage(String image) {
-            this.image = image;
-        }
-
-        public void setLength(Double length) {
-            Length = length;
-        }
-
-        public void setWeight(Double weight) {
-            Weight = weight;
-        }
-
-        public void setComments(String comments) {
-            Comments = comments;
-        }
-
-        public void setDangerous(String dangerous) {
-            Dangerous = dangerous;
-        }
-
-        public void setFresh(boolean fresh) {
-            Fresh = fresh;
-        }
-
-        public void setSaltwater(boolean saltwater) {
-            Saltwater = saltwater;
-        }
-
-        /* Logic Methods */
-
-        @NonNull
-        @Override
-        public String toString() {
-            return String.format("<Fish: %s,\nBodyShape: %s,\nLength: %.2f,\nWeight: %.2f,\nComments: %s>",this.FBname, this.BodyShapeI, this.Length, this.Weight, this.Comments);
-        }
     }
 
 }

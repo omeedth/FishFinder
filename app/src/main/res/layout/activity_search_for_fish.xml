@@ -11,16 +11,17 @@
         android:id="@+id/edtSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="66dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="54dp"
         android:ems="10"
-        android:hint="Genus, Species, State"
+        android:hint="Enter a State! EX: MA"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/lat_long_container"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.507"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSpecies" />
 
     <LinearLayout
         android:id="@+id/lat_long_container"
@@ -64,5 +65,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lat_long_container" />
+
+    <TextView
+        android:id="@+id/textViewSpecies"
+        android:layout_width="323dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

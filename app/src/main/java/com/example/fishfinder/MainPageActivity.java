@@ -33,8 +33,12 @@ public class MainPageActivity extends AppCompatActivity {
         btnSearchFish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goToSearchForFishActivity = new Intent(v.getContext(), SearchForFishActivity.class);
-                startActivity(goToSearchForFishActivity);
+//                Intent goToSearchForFishActivity = new Intent(v.getContext(), SearchForFishActivity.class);
+//                startActivity(goToSearchForFishActivity);
+
+                /* Go to FishInfoPage */
+                Intent goToFishInfoActivity = new Intent(v.getContext(), FishInfoActivity.class);
+                startActivity(goToFishInfoActivity);
             }
         });
 
