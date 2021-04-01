@@ -83,8 +83,7 @@ public class FishInfoActivity extends AppCompatActivity {
 
                 Intent goToSearchForFishActivity = new Intent(view.getContext(), SearchForFishActivity.class);
                 goToSearchForFishActivity.putExtra("species", fishInfo.getSpecies()); //using the species from fish info we send the user to the page and packing the species name with it
-
-                //based on item add info to intent
+                                                                                            // based on item add info to intent
                 startActivity(goToSearchForFishActivity);
             }
         });
