@@ -31,10 +31,10 @@ public class FishInfoActivity extends AppCompatActivity {
     private Context ctx;
 
     // FishBase API
-    private final String    FishBaseAPIBase = "https://fishbase.ropensci.org/";
-    private final String    FishBaseAPISpecies = "species?";
-    private final String    FishBaseSpeciesSearch = "Species=";
-    private final String    FishBaseFBNameSearch = "FBname=";
+    private final String    FishBaseAPIBase        = "https://fishbase.ropensci.org/";
+    private final String    FishBaseAPISpecies     = "species?";
+    private final String    FishBaseSpeciesSearch  = "Species=";
+    private final String    FishBaseFBNameSearch   = "FBname=";
 
     /* Components */
     private EditText editTextSearchFish;
