@@ -37,10 +37,12 @@ public class SearchForFishActivity extends AppCompatActivity {
     private TextView        tvGoogleMap;
     private Button          btnGoToFish;
 
-    // NAS API (Find coordinates of fish)
+    // NAS API (Find coordinates of fish), A String variable base used to plug in end point values
     private final String    APIBase = "https://nas.er.usgs.gov/api/v2/occurrence/search?";
     private String apiResult = "";
 
+    //A variable to open a new thread so that it does not crash with overloading main UI thread,
+    // we run heavy load functions with this by opening this thread in a run function
     ExecutorService service = Executors.newFixedThreadPool(1);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,7 @@ public class SearchForFishActivity extends AppCompatActivity {
             if(extras == null) {
                 SPECIES = DEFAULT_SPECIES;
             } else {
+                //Grab the species from the previous page through the bundle and set the value for the species to be used on this page
                 Log.i("Info", "Found Species <" + extras.getString("species") + "> in Bundle\'s Extras!");
                 SPECIES = extras.getString("species");
             }
@@ -124,7 +127,7 @@ public class SearchForFishActivity extends AppCompatActivity {
         /* Debugging */
         Log.i("Debug", urlString);
 
-        String response  = fetch(urlString);
+        String response  = fetch(urlString); //Call fetch to handle our URL in order to get a response
         parseCordinates(response);
     }
 
@@ -133,10 +136,13 @@ public class SearchForFishActivity extends AppCompatActivity {
     }
 
     private String fetch(String urlString){
+
+        //open a new thread using our 1 thread executor in order to grab information so as to not crash our main UI thread running in the background
         service.execute(new Runnable() {
             @Override
             public void run() {
                 try {
+                    //Basic http Json object fetching
                     String input;
                     URL url = new URL(urlString);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -155,6 +161,7 @@ public class SearchForFishActivity extends AppCompatActivity {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
+                            //Temporary but set the coordinates to TextView in the page, later we will turn coordinates to actual markers on a google maps
                             tvGoogleMap.setText(coordinates);
                         }
                     });
@@ -175,10 +182,12 @@ public class SearchForFishActivity extends AppCompatActivity {
             JSONArray results        = job.getJSONArray("results");
 
             for (int i=0; i< results.length(); i++){
+                //looping across our result of Json objects
                 JSONObject element   = results.getJSONObject(i);
                 Double latitude      =  element.getDouble("decimalLatitude");
                 Double longitude     = element.getDouble("decimalLongitude");
-                buffer.append(String.format("%.5f,                    %.5f\n", latitude, longitude));
+                buffer.append(String.format("%.5f,                    %.5f\n", latitude, longitude)); //Formating the string input so our text view will show an organized coordinate listing
+                                                                                                        //of latitude and longitude
 
             }
         } catch(Exception e){

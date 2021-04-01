@@ -31,7 +31,7 @@ public class FishInfoActivity extends AppCompatActivity {
     private Context ctx;
 
     // FishBase API
-    private final String    FishBaseAPIBase = "https://fishbase.ropensci.org/";
+    private final String    FishBaseAPIBase = "https://fishbase.ropensci.org/"; //The base of our endpoint, below are the other string variable fill-ins for our url when we want to build a request
     private final String    FishBaseAPISpecies = "species?";
     private final String    FishBaseSpeciesSearch = "Species=";
     private final String    FishBaseFBNameSearch = "FBname=";
@@ -41,7 +41,8 @@ public class FishInfoActivity extends AppCompatActivity {
     private Button buttonSearchForFish;
     private ListView listViewFishInfo;
 
-    ExecutorService service = Executors.newFixedThreadPool(1);
+    ExecutorService service = Executors.newFixedThreadPool(1);     //A variable to open a new thread so that it does not crash with overloading main UI thread,
+                                                                            // we run heavy load functions with this by opening this thread in a run function
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,10 +77,12 @@ public class FishInfoActivity extends AppCompatActivity {
         listViewFishInfo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                //Based on what was clicked we pack that info to a fishinfo object so we can get the species and other info but currently we only need the species at this point.
                 FishInfo fishInfo = (FishInfo) parent.getItemAtPosition(position);
 
                 Intent goToSearchForFishActivity = new Intent(view.getContext(), SearchForFishActivity.class);
-                goToSearchForFishActivity.putExtra("species", fishInfo.getSpecies());
+                goToSearchForFishActivity.putExtra("species", fishInfo.getSpecies()); //using the species from fish info we send the user to the page and packing the species name with it
 
                 //based on item add info to intent
                 startActivity(goToSearchForFishActivity);
@@ -121,6 +124,7 @@ public class FishInfoActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    //Basic http Json object fetching
                     String input;
                     URL url = new URL(urlString);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -136,14 +140,14 @@ public class FishInfoActivity extends AppCompatActivity {
                     in.close();
                     con.disconnect();
 
-                    ArrayList<FishInfo> fishInfoList = parseFishInfo(content.toString());
+                    ArrayList<FishInfo> fishInfoList = parseFishInfo(content.toString()); //we make fishinfo objects based on what we got from the json object.
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
 
                             /* Fill The List View */
                             FishInfoAdapter fishInfoAdapter = new FishInfoAdapter(ctx, R.layout.list_view_fish_info, fishInfoList);
-                            listViewFishInfo.setAdapter(fishInfoAdapter);
+                            listViewFishInfo.setAdapter(fishInfoAdapter); //basic populating and inflating our fish adapter to view
 
                             System.out.println("FishInfo: " + fishInfoList);
                         }
@@ -158,6 +162,7 @@ public class FishInfoActivity extends AppCompatActivity {
         return "";
     }
 
+    //given a json string input we make the information be readily available in our fishinfo class using this method
     private ArrayList<FishInfo> parseFishInfo(String input){
         ArrayList<FishInfo> fishInfoList = new ArrayList<>();
         try {

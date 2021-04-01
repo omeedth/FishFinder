@@ -23,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
         bntSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //button sign in to get to main page
                 Intent intent = new Intent(v.getContext(), MainPageActivity.class);
                 startActivity(intent);
             }
@@ -31,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //button register to get to register page
                 Intent goToRegisterPage = new Intent(v.getContext(), RegisterActivity.class);
                 startActivity(goToRegisterPage);
             }

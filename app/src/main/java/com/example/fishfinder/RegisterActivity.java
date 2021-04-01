@@ -48,7 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     /* Logic Methods */
     public void signup() {
-
+        //to be done
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.fishfinder;
 
 public class FishInfo {
+    //A class to help us instantiate objects that hold important informations about a queried fish.
 
     /* Variables - (Variable names are same as JSON keys) */
     private String FBname;
