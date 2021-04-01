@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="130dp"
+        android:layout_height="100dp"
         android:padding="5dp" />
 
     <TextView

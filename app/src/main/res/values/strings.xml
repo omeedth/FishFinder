@@ -21,4 +21,5 @@
     <string name="textview">Google Maps</string>
     <!-- Fish Info Page -->
     <string name="i_caught_fish">I Caught The Fish!</string>
+    <string name="title_activity_fish_location">Map</string>
 </resources>

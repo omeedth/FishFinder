@@ -1,9 +1,10 @@
-package com.example.fishfinder;
+package com.example.fishfinder.data;
 
 public class FishInfo {
 
     /* Variables - (Variable names are same as JSON keys) */
-    private String FBname;
+    private String common_name; // From USGS NAS API
+    private String FBname;      // From Fish Base API
     private String Species;
     private String BodyShapeI;
     private Double Length;
@@ -15,7 +16,8 @@ public class FishInfo {
     private boolean Saltwater;
 
     /* Constructor - TODO: Possibly make default values null */
-    FishInfo() {
+    public FishInfo() {
+        common_name = null;
         FBname = null;
         Species = null;
         BodyShapeI = null;
@@ -30,6 +32,10 @@ public class FishInfo {
 
     public String getSpecies() {
         return Species;
+    }
+
+    public String getCommon_name() {
+        return common_name;
     }
 
     public String getFBname() {
@@ -72,6 +78,10 @@ public class FishInfo {
 
     public void setSpecies(String species) {
         this.Species = species;
+    }
+
+    public void setCommon_name(String common_name) {
+        this.common_name = common_name;
     }
 
     public void setFBname(String FBname) {

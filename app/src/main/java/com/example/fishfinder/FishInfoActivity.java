@@ -7,41 +7,61 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.example.fishfinder.adapters.FishInfoAdapter;
+import com.example.fishfinder.data.FishInfo;
+import com.example.fishfinder.util.RestAPIUtil;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class FishInfoActivity extends AppCompatActivity {
 
     /* Variables */
-    private String speciesEntered = "";
-    private Context ctx;
+    private String speciesEntered = "";     // Will save the string of the species you enter inside the EditText
+    private String fishNameEntered = "";    // Will save the String of the Fish Name you enter inside the EditText
+    private Context ctx;                    // Saves the Context of this Activity so that we may use it later within anonymous functions with no context
+    private FishInfoAdapter fishInfoAdapter;
 
-    // FishBase API
+    // FishBase API Endpoints
     private final String    FishBaseAPIBase = "https://fishbase.ropensci.org/";
     private final String    FishBaseAPISpecies = "species?";
-    private final String    FishBaseSpeciesSearch = "Species=";
-    private final String    FishBaseFBNameSearch = "FBname=";
+
+    // FishBase API search Queries
+    private final String    FishBaseSpeciesSearch = "Species="; // Search based off species names
+    private final String    FishBaseFBNameSearch = "FBname=";   // Search based off of common name (Must be very accurate)
+
+    // TODO: Use USGS NAS species endpoint in order to figure out all the searchable fish
+    // Don't allow the user to search fish in FishBase that aren't in USGS NAS
+    // USGS NAS API Endpoints
+    private final String    USGS_NAS_API_SPECIES_ENDPOINT = "https://nas.er.usgs.gov/api/v2/species"; // We can use this by itself to get all species, or append "/{key}" where key is the species ID
 
     /* Components */
     private EditText editTextSearchFish;
+    private EditText editTextFishNameSearch;
     private Button buttonSearchForFish;
     private ListView listViewFishInfo;
 
+    // Only purpose is to run a function on a different thread, avoids thread locking on the UI
     ExecutorService service = Executors.newFixedThreadPool(1);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,26 +69,56 @@ public class FishInfoActivity extends AppCompatActivity {
 
         /* Initialize Variables */
         ctx = this.getBaseContext();
+        fishInfoAdapter = new FishInfoAdapter(ctx, R.layout.list_view_fish_info, new ArrayList<FishInfo>());
 
         /* Initializing Components */
         listViewFishInfo = (ListView) findViewById(R.id.listViewFishInfo);
         editTextSearchFish = (EditText) findViewById(R.id.editTextSearchFish);
+        editTextFishNameSearch = (EditText) findViewById(R.id.editTextFishNameSearch);
         buttonSearchForFish = (Button) findViewById(R.id.buttonSearchForFish);
 
-        /* Add Listener */
+        /* Pre Setup */
+        listViewFishInfo.setAdapter(fishInfoAdapter); // Setting the ListAdapter which will populate the ListView
 
+        /* Add Listeners */
+
+        // Calls FishBase API to search for info on Fish based on Species
         buttonSearchForFish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                final String DEFAULT_SPECIES = "cyanellus";
+                final String DEFAULT_SPECIES = "cyanellus"; // TODO: Change the default
+
+                /* Clear List Adapter */
+                fishInfoAdapter.clear();
 
                 /* Extract Text */
                 speciesEntered = cleanSpeciesSearch(editTextSearchFish.getText().toString());
+                fishNameEntered = editTextFishNameSearch.getText().toString().trim();
 
                 /* Get Fish Info */
                 if (speciesEntered.equals("")) speciesEntered = DEFAULT_SPECIES;
-                getFishInfo(speciesEntered);
+
+                // If fish Name is entered then search by Fish Name
+                if (fishNameEntered.length() > 0) {
+
+                    int endPoint = 10000;   // How many records will we try to search for
+                    int offset = 0;         // Where we start searching from
+                    int batchSize = 100;    // How many records we search per query
+
+                    getFishInfoFromTo(offset, batchSize, endPoint, fishNameEntered);
+
+                } else if (speciesEntered.length() > 0) {
+                    getFishInfo(speciesEntered);
+                } else {
+                    // Nothing was entered in any field
+
+                    // TODO: Call the USGS NAS API to obtain all species
+
+                    // TODO: For each species from USGS NAS, pass the common name into FishBase API in order to get more info on fish
+
+                    // TODO: Fill ListView with data after collecting info from both APIs
+                }
 
             }
         });
@@ -88,6 +138,11 @@ public class FishInfoActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *
+     * @param inputString - The String you would like to clean
+     * @return A sanitized String (One Word, No Numbers, No Extra Whitespaces)
+     */
     public static String cleanSpeciesSearch(String inputString) {
 
         final String DEFAULT_VALUE = "";
@@ -116,38 +171,32 @@ public class FishInfoActivity extends AppCompatActivity {
         return cleanString;
     }
 
-    private String fetchFishBase(String urlString) {
+    /**
+     *
+     * @param urlString - The URL the function will fetch data from
+     */
+    private void fetchFishBase(String urlString) {
         service.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    String input;
-                    URL url = new URL(urlString);
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    con.setRequestMethod("GET");
-                    //con.setRequestProperty("Content-Type", "application/json");
-                    con.setConnectTimeout(5000);
-                    //int status           = con.getResponseCode();
-                    BufferedReader in      = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    StringBuffer content   = new StringBuffer();
-                    while ((input = in.readLine()) != null){
-                        content.append(input);
-                    }
-                    in.close();
-                    con.disconnect();
 
+                    /* Send GET Request to obtain data from URL, and parse as JSON */
+                    String content = RestAPIUtil.get(urlString);
                     ArrayList<FishInfo> fishInfoList = parseFishInfo(content.toString());
+
+                    // This will post a command to the main UI Thread
+                    // This is necessary so that the code knows the variables for this class
+                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
 
-                            /* Fill The List View */
-                            FishInfoAdapter fishInfoAdapter = new FishInfoAdapter(ctx, R.layout.list_view_fish_info, fishInfoList);
-                            listViewFishInfo.setAdapter(fishInfoAdapter);
+                            fillFishInfoAdapter(fishInfoList);
 
-                            System.out.println("FishInfo: " + fishInfoList);
                         }
                     });
+
                 } catch (Exception e){
                     e.printStackTrace();
                     System.out.println(e.getLocalizedMessage());
@@ -155,15 +204,25 @@ public class FishInfoActivity extends AppCompatActivity {
             }
         });
 
-        return "";
     }
 
+    /**
+     *
+     * @param input - String in JSON format
+     * @return ArrayList<FishInfo> parsed from the String JSON
+     */
     private ArrayList<FishInfo> parseFishInfo(String input){
+
+        // Initialize List to fill with FishInfo Objects
         ArrayList<FishInfo> fishInfoList = new ArrayList<>();
+
         try {
+
+            // Convert the input String into a JSON Object, and then go to the main results/data
             JSONObject job           = new JSONObject(input);
             JSONArray results        = job.getJSONArray("data");
 
+            // Cycle through each entry and grab the desired data points
             for (int i=0; i< results.length(); i++){
 
                 // Initialize FishInfo Object
@@ -175,12 +234,14 @@ public class FishInfoActivity extends AppCompatActivity {
                 fishInfo.setFBname(element.getString("FBname"));
                 fishInfo.setBodyShapeI(element.getString("BodyShapeI"));
 
+                // In case the "Length" key is not parsable as a Double
                 try {
                     fishInfo.setLength(element.getDouble("Length"));
                 } catch (Exception e) {
                     fishInfo.setLength(null);
                 }
 
+                // In case the "Weight" key is not parsable as a Double
                 try {
                     fishInfo.setWeight(element.getDouble("Weight"));
                 } catch (Exception e) {
@@ -199,20 +260,159 @@ public class FishInfoActivity extends AppCompatActivity {
                 fishInfoList.add(fishInfo);
 
             }
+
         } catch(Exception e){
             e.printStackTrace();
             System.out.println(e.getLocalizedMessage());
         }
+
         return fishInfoList;
     }
 
+    /**
+     *
+     * @param species - The name of the species of fish you would like to search for
+     */
     private void getFishInfo(String species) {
 
         /* Fetch API Call from Fishbase API */
-        String completeAPICall = FishBaseAPIBase + FishBaseAPISpecies + FishBaseSpeciesSearch + species;
-        System.out.println("API Call: " + completeAPICall);
+        String completeAPICall = FishBaseAPIBase + FishBaseAPISpecies + FishBaseSpeciesSearch + species; // Combines the Base API strings with the query
+
+        // DEBUGGING
+        Log.i("Info", "API Call: " + completeAPICall);
+
+        /* Fetch the results from the API */
         fetchFishBase(completeAPICall);
 
+    }
+
+    /**
+     * Fills the CustomListAdapter for FishInfo
+     * @param fishInfoList - the array of FishInfo objects to populate the ListView with
+     */
+    private void fillFishInfoAdapter(ArrayList<FishInfo> fishInfoList) {
+
+        /* Fill The List View */
+        fishInfoAdapter.clear();
+        fishInfoAdapter.addAll(fishInfoList);
+        fishInfoAdapter.notifyDataSetChanged();
+
+    }
+
+    /**
+     *
+     * @param startOffset - The offset where we start searching in the database for data
+     * @param batchSize - How much data we look for between each search
+     * @param endPoint  - Until when are we searching data in the database
+     * @param nameRegex - The String by which we are filtering our data with
+     * @return the filtered ArrayList<FishInfo>
+     */
+    private ArrayList<FishInfo> getFishInfoFromTo(int startOffset, int batchSize, int endPoint, String nameRegex) {
+        assert startOffset <= endPoint;
+
+        // Initialize list of FishInfo to fill
+        ArrayList<FishInfo> fishinfoList = new ArrayList<>();
+        final String lowerCaseNameRegex = nameRegex.toLowerCase();
+
+        // Go through each result from the FishBase Species API Endpoint
+        // After each loop offset until you grabbed all of the data or reached the endPoint
+        for (int offset = startOffset; offset < endPoint;) {
+
+            // API Queries
+            int limit = Math.min(batchSize, endPoint - startOffset);
+            String limitQuery = "limit=" + limit;
+            String offsetQuery = "offset=" + offset;
+            String limitAndOffsetQuery = limitQuery + "&" + offsetQuery;
+            String completeAPICall = FishBaseAPIBase + FishBaseAPISpecies + limitAndOffsetQuery;
+
+            // Fetch data from API and save into FishInfoList based off of Filter
+            try {
+                service.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+
+                            /* Send GET Request to obtain data from URL, and parse as JSON */
+                            String content = RestAPIUtil.get(completeAPICall);
+                            ArrayList<FishInfo> fishInfoFromAPI = parseFishInfo(content);
+                            ArrayList<FishInfo> filteredFishInfo = new ArrayList<>();
+
+                            // Check to see if name contains the string, and add it to the list if so
+                            for (FishInfo fishInfo : fishInfoFromAPI) {
+//                                System.out.println("Fish Name: " + fishInfo.getFBname());
+                                if (fishInfo.getFBname().toLowerCase().contains(lowerCaseNameRegex)) filteredFishInfo.add(fishInfo);
+                            }
+
+                            // This will post a command to the main UI Thread
+                            // This is necessary so that the code knows the variables for this class
+                            // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    if (filteredFishInfo.size() > 0) {
+//                                        Log.i("Info", "Fish Found: " + filteredFishInfo.toString());
+                                        fishInfoAdapter.addAll(filteredFishInfo);
+                                        fishInfoAdapter.notifyDataSetChanged();
+                                        Log.i("Info", "Fish Found: " + fishInfoAdapter.getCount() + ", Adapter: " + fishInfoAdapter.toString());
+                                    }
+
+                                }
+                            });
+
+                        } catch(Exception e) {
+                            e.printStackTrace();
+                            System.out.println(e.getLocalizedMessage());
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                fishinfoList = new ArrayList<FishInfo>();
+                e.printStackTrace();
+            }
+
+            // Increment offset by limit (how many entries we searched for)
+            offset += limit;
+
+        }
+
+        return fishinfoList;
+
+    }
+
+    /**
+     * Shortened Version of getFishInfoFromTo(). Defaults to no endpoint AKA Integer.MAX_VALUE
+     * @param startOffset - The offset where we start searching in the database for data
+     * @param batchSize - How much data we look for between each search
+     * @param nameRegex - The String by which we are filtering our data with
+     * @return the filtered ArrayList<FishInfo>
+     */
+    private ArrayList<FishInfo> getFishInfoFromTo(int startOffset, int batchSize, String nameRegex) {
+        return getFishInfoFromTo(startOffset, batchSize, Integer.MAX_VALUE, nameRegex);
+    }
+
+    /**
+     * Shortened Version of getFishInfoFromTo().
+     * 1. Defaults to no endpoint AKA Integer.MAX_VALUE
+     * 2. Defaults startOffset to 0 AKA no offset
+     * @param batchSize - How much data we look for between each search
+     * @param nameRegex - The String by which we are filtering our data with
+     * @return the filtered ArrayList<FishInfo>
+     */
+    private ArrayList<FishInfo> getFishInfoFromTo(int batchSize, String nameRegex) {
+        return getFishInfoFromTo(0, batchSize, nameRegex);
+    }
+
+    /**
+     * Shortened Version of getFishInfoFromTo().
+     * 1. Defaults to no endpoint AKA Integer.MAX_VALUE
+     * 2. Defaults startOffset to 0 AKA no offset
+     * 3. Defaults batchSize to 10 (amount of records to get per GET Request)
+     * @param nameRegex - The String by which we are filtering our data with
+     * @return the filtered ArrayList<FishInfo>
+     */
+    private ArrayList<FishInfo> getFishInfoFromTo(String nameRegex) {
+        return getFishInfoFromTo(10, nameRegex);
     }
 
 }

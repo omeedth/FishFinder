@@ -11,7 +11,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.example.fishfinder.util.RestAPIUtil;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,20 +34,28 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SearchForFishActivity extends AppCompatActivity {
+public class SearchForFishActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     /* Variables */
-    private final String DEFAULT_SPECIES = "cyanellus";
+    private final String DEFAULT_SPECIES = "cyanellus"; // TODO: Change the default
     private String SPECIES;
+    private GoogleMap mMap;
 
     //Components
     private TextView        textViewSpecies;
     private EditText        edtSearch;
     private TextView        tvGoogleMap;
     private Button          btnGoToFish;
+    private FrameLayout     map_container;
 
-    // NAS API (Find coordinates of fish)
+    // TODO: Add other possible fish location APIs (Found Here: http://www.fishmap.org/technology.html)
+    // 1. http://fishnet2.net/api/v1/apihelp.htm#params (Waiting for API Key)
+    // 2. https://explorer.natureserve.org/api-docs/    (Haven't found latitude and longitude endpoint, How to pass data: https://stackoverflow.com/questions/52974330/spring-post-method-required-request-body-is-missing)
+    // NAS API (Find coordinates of fish) - DOCUMENTATION: https://nas.er.usgs.gov/api/documentation.aspx
     private final String    APIBase = "https://nas.er.usgs.gov/api/v2/occurrence/search?";
+    private final String    speciesQuery = "species=";
+    private final String    spatialAccQuery = "spatialAcc=";
+
     private String apiResult = "";
 
     ExecutorService service = Executors.newFixedThreadPool(1);
@@ -48,6 +65,7 @@ public class SearchForFishActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search_for_fish);
 
         /* Get Bundle Info */
+        // TODO: Make FishInfo Object Serializable, and send the whole Object over
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
@@ -65,9 +83,14 @@ public class SearchForFishActivity extends AppCompatActivity {
         edtSearch       = findViewById(R.id.edtSearch);
         tvGoogleMap     = findViewById(R.id.tvGoogleMap);
         btnGoToFish     = findViewById(R.id.btnGoToFish);
+        map_container   = findViewById(R.id.map_container);
 
         /* Setup */
+        // Display the Name of the fish you are searching locations for
         textViewSpecies.setText("Searching for: " + SPECIES);
+
+        // Adds the map Fragment inside the map_container
+        addMapFragment();
 
         /* Listeners */
         btnGoToFish.setOnClickListener(new View.OnClickListener() {
@@ -77,6 +100,10 @@ public class SearchForFishActivity extends AppCompatActivity {
                 // Call NAS API (Finds Locations of Fish)
                 String name = edtSearch.getText().toString();
                 getCordinates(name);
+
+                // Change Intent to Google Map Intent
+//                Intent goToFishLocationActivity = new Intent(v.getContext(), FishLocationActivity.class);
+//                startActivity(goToFishLocationActivity);
 
             }
         });
@@ -124,40 +151,155 @@ public class SearchForFishActivity extends AppCompatActivity {
         /* Debugging */
         Log.i("Debug", urlString);
 
-        String response  = fetch(urlString);
-        parseCordinates(response);
+        fetch(urlString);
+//        parseCordinates(response);
     }
 
     private void longLatToMap(String[] cordinates){
 
     }
 
-    private String fetch(String urlString){
+    /**
+     * Fetches data from the API Endpoint URL and set's the coordinates
+     * @param urlString - The URL the function will fetch data from
+     */
+    private void fetch(String urlString){
         service.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    String input;
-                    URL url = new URL(urlString);
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    con.setRequestMethod("GET");
-                    //con.setRequestProperty("Content-Type", "application/json");
-                    con.setConnectTimeout(5000);
-                    //int status           = con.getResponseCode();
-                    BufferedReader in      = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    StringBuffer content   = new StringBuffer();
-                    while ((input = in.readLine()) != null){
-                        content.append(input);
-                    }
-                    in.close();
-                    con.disconnect();
-                    String coordinates = parseCordinates(content.toString());
+
+                    /* Send GET Request to obtain data from URL, and parse as JSON */
+                    String content = RestAPIUtil.get(urlString);
+                    ArrayList<LatLng> latLngCoordinates = parseCordinates(content.toString());
+
+                    // This will post a command to the main UI Thread
+                    // This is necessary so that the code knows the variables for this class
+                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            tvGoogleMap.setText(coordinates);
+
+                            /* Add Markers of Fish Locations */
+                            for (int i = 0; i < latLngCoordinates.size(); i++) {
+                                LatLng coordinates = latLngCoordinates.get(i);
+                                mMap.addMarker(new MarkerOptions().position(coordinates).title("Marker " + i));
+                            }
+
+                            /* Navigate to last Marker if one exists */
+                            if (latLngCoordinates.size() > 0) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngCoordinates.get(latLngCoordinates.size() - 1)));
+                            }
+
+//                            tvGoogleMap.setText(coordinates);
                         }
                     });
+
+                } catch (Exception e){
+                    e.printStackTrace();
+                    System.out.println(e.getLocalizedMessage());
+                }
+            }
+        });
+    }
+
+    /**
+     *
+     * @param input - String in JSON format
+     * @return LatLng Object parsed from the String JSON
+     */
+    private ArrayList<LatLng> parseCordinates(String input){
+        StringBuffer buffer = new StringBuffer();
+        ArrayList<LatLng> latLngCoordinates = new ArrayList<>();
+
+        try {
+            JSONObject job           = new JSONObject(input);
+            JSONArray results        = job.getJSONArray("results");
+
+            for (int i=0; i< results.length(); i++){
+                JSONObject element   = results.getJSONObject(i);
+
+                // Surround in try-catch in case latitudes or longitudes are not parsable as Doubles
+                try {
+                    Double latitude      =  element.getDouble("decimalLatitude");
+                    Double longitude     = element.getDouble("decimalLongitude");
+
+                    latLngCoordinates.add(new LatLng(latitude, longitude));
+                    buffer.append(String.format("%.5f,                    %.5f\n", latitude, longitude));
+                } catch (Exception e) {
+                    Log.e("Error", e.getLocalizedMessage());
+                }
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+            System.out.println(e.getLocalizedMessage());
+        }
+
+        return latLngCoordinates;
+    }
+
+    /* Google Map Methods */
+
+    /**
+     * This method adds map fragment to the container.
+     */
+    private void addMapFragment() {
+        SupportMapFragment mMapFragment = SupportMapFragment.newInstance();
+        mMapFragment.getMapAsync(this);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.map_container, mMapFragment)
+                .commit();
+    }
+
+    /**
+     * The method that runs when the map is ready to be displayed
+     * @param googleMap - A GoogleMap Object
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        /* Change Map Options */
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.getUiSettings().setZoomGesturesEnabled(true);
+
+        /* Complete the API call to GET all LatLng's of where a fish can be caught */
+        String spatialAcc = "Accurate";
+        // TODO: Add search by "commonName" because there are multiple fish in a species
+        String urlString = APIBase + speciesQuery + SPECIES + "&" + spatialAccQuery + spatialAcc;   // API call that will get all locations this fish can be caught
+        Log.i("Info", "URL: " + urlString);
+
+        /* Add Markers of Fish Locations */
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    /* Send GET Request to obtain data from URL, and parse as JSON */
+                    String content = RestAPIUtil.get(urlString);
+                    ArrayList<LatLng> latLngCoordinates = parseCordinates(content);
+
+                    // This will post a command to the main UI Thread
+                    // This is necessary so that the code knows the variables for this class
+                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            /* Add Markers of Fish Locations */
+                            for (int i = 0; i < latLngCoordinates.size(); i++) {
+                                LatLng coordinates = latLngCoordinates.get(i);
+                                mMap.addMarker(new MarkerOptions().position(coordinates).title("Marker " + i));
+                            }
+
+                            /* Navigate to last Marker if one exists */
+                            if (latLngCoordinates.size() > 0) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngCoordinates.get(latLngCoordinates.size() - 1)));
+                            }
+
+                        }
+                    });
+
                 } catch (Exception e){
                     e.printStackTrace();
                     System.out.println(e.getLocalizedMessage());
@@ -165,27 +307,7 @@ public class SearchForFishActivity extends AppCompatActivity {
             }
         });
 
-        return "";
     }
 
-    private String parseCordinates(String input){
-        StringBuffer buffer = new StringBuffer();
-        try {
-            JSONObject job           = new JSONObject(input);
-            JSONArray results        = job.getJSONArray("results");
-
-            for (int i=0; i< results.length(); i++){
-                JSONObject element   = results.getJSONObject(i);
-                Double latitude      =  element.getDouble("decimalLatitude");
-                Double longitude     = element.getDouble("decimalLongitude");
-                buffer.append(String.format("%.5f,                    %.5f\n", latitude, longitude));
-
-            }
-        } catch(Exception e){
-            e.printStackTrace();
-            System.out.println(e.getLocalizedMessage());
-        }
-        return buffer.toString();
-    }
-
+    /*----------------------*/
 }
