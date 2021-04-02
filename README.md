@@ -17,13 +17,13 @@ Is mobile application, developed using Android Studio to help users learn about 
 The app will display all the available information about the fish in a costumed List View, the user can click on any item in the list view, by clicking on an item, the user then will be directed to another page in which he will be able to search for that fish by enter the ÒStateÓ (eg. MA), the app will populate the coordinates associated with that fish that corresponds to the entered state and display those coordinates to the user in a latitude - longitude format.
 
 # Project Settings
-```Emulated On:``` Google Pixel 1 <\br>
+```Emulated On:``` Google Pixel 1 <br/>
 ```Min SDK:``` 22 - Android 5.1 Lollipop
 
 # Technologies
-```* means this project requires the API key to be added in keys.xml``` <\br>
-FishBase API <\br>
-USGS NAS API <\br>
+```* means this project requires the API key to be added in keys.xml``` <br/>
+FishBase API <br/>
+USGS NAS API <br/>
 Google Maps API (API Key Required)*
 
 # Usage
