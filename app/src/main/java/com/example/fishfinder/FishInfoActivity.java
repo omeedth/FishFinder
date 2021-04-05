@@ -129,7 +129,9 @@ public class FishInfoActivity extends AppCompatActivity {
                 FishInfo fishInfo = (FishInfo) parent.getItemAtPosition(position);
 
                 Intent goToSearchForFishActivity = new Intent(view.getContext(), SearchForFishActivity.class);
-                goToSearchForFishActivity.putExtra("species", fishInfo.getSpecies());
+                Bundle loadData = new Bundle();
+//                loadData.putSerializable("fishInfo", fishInfo);
+                goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
 
                 //based on item add info to intent
                 startActivity(goToSearchForFishActivity);

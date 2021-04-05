@@ -24,11 +24,13 @@ The app will display all the available information about the fish in a costumed 
 ```* means this project requires the API key to be added in keys.xml``` <br/>
 FishBase API <br/>
 USGS NAS API <br/>
+Firebase API (API Key Required) <br/>
 Google Maps API (API Key Required)*
 
 # Usage
 1. Clone Project
 2. Import the project folder into Android Studio
 3. Add the keys.xml file in your "res/values" folder (This will contain all API keys and/or other private values! NOTE: You must add your own API keys here)
-4. Sync the project with Gradle
-5. Run Project
+4. Create a Firebase project, download the google-services.json file, and navigate to the android projects main project directory. Place the google-services.json in the app folder.
+5. Sync the project with Gradle
+6. Run Project
