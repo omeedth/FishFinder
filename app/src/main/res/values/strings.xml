@@ -22,4 +22,6 @@
     <!-- Fish Info Page -->
     <string name="i_caught_fish">I Caught The Fish!</string>
     <string name="title_activity_fish_location">Map</string>
+    <string name="google_api_key1">AIzaSyBUQpGImgGhLK5u4g_RWx-PgLyWprHvLEs</string>
+    <string name="sign_in_email">Email</string>
 </resources>
