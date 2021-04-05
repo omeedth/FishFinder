@@ -38,6 +38,10 @@
         <activity android:name=".SearchForFishActivity" />
         <activity android:name=".MainPageActivity" />
         <activity android:name=".RegisterActivity" />
+        <activity android:name=".SettingsPageActivity" />
+        <activity android:name=".UserProfileActivity" />
+
+
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
