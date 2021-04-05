@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.example.fishfinder.data.FishInfo;
 import com.example.fishfinder.util.RestAPIUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,6 +41,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     private final String DEFAULT_SPECIES = "cyanellus"; // TODO: Change the default
     private String SPECIES;
     private GoogleMap mMap;
+    private FishInfo fishInfo;
 
     //Components
     private TextView        textViewSpecies;
@@ -71,11 +73,12 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             if(extras == null) {
                 SPECIES = DEFAULT_SPECIES;
             } else {
-                Log.i("Info", "Found Species <" + extras.getString("species") + "> in Bundle\'s Extras!");
-                SPECIES = extras.getString("species");
+//                Log.i("Info", "Found Species <" + extras.getString("species") + "> in Bundle\'s Extras!");
+//                SPECIES = extras.getString("species");
+                fishInfo = (FishInfo) extras.getSerializable("fishInfo");
             }
         } else {
-//            newString= (String) savedInstanceState.getSerializable("STRING_I_NEED");
+//            fishInfo = (FishInfo) savedInstanceState.getSerializable("fishInfo");
         }
 
         /* Initialize Components */
@@ -87,7 +90,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
         /* Setup */
         // Display the Name of the fish you are searching locations for
-        textViewSpecies.setText("Searching for: " + SPECIES);
+        textViewSpecies.setText("Searching for: " + fishInfo.getFBname());
 
         // Adds the map Fragment inside the map_container
         addMapFragment();

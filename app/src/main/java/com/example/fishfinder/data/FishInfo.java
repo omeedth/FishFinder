@@ -1,6 +1,8 @@
 package com.example.fishfinder.data;
 
-public class FishInfo {
+import java.io.Serializable;
+
+public class FishInfo implements Serializable {
 
     /* Variables - (Variable names are same as JSON keys) */
     private String common_name; // From USGS NAS API
