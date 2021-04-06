@@ -23,42 +23,42 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="Themes:" />
 
             <TextView
                 android:id="@+id/textView8"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="Default Settings" />
 
             <TextView
                 android:id="@+id/textView7"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="Show Top Posting Visibility:" />
 
             <TextView
                 android:id="@+id/textView6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="Public Postings Visibility:" />
 
             <TextView
                 android:id="@+id/textView5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="Ask to post publicly?" />
 
             <TextView
                 android:id="@+id/textView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="Sync data automatically?" />
 
         </LinearLayout>
 
@@ -77,7 +77,7 @@
                 android:id="@+id/switch5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Switch"
+                android:text="Off"
                 android:layout_weight="1"
                 />
 
@@ -85,7 +85,7 @@
                 android:id="@+id/switch6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Switch"
+                android:text="Off"
                 android:layout_weight="1"
                 />
 
@@ -93,7 +93,7 @@
                 android:id="@+id/switch7"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Switch"
+                android:text="Off"
                 android:layout_weight="1"
                 />
 
@@ -101,7 +101,7 @@
                 android:id="@+id/switch8"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Switch"
+                android:text="Never"
                 android:layout_weight="1"
                 />
 
@@ -109,7 +109,7 @@
                 android:id="@+id/switch9"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Switch"
+                android:text="No"
                 android:layout_weight="1"
                 />
         </LinearLayout>
