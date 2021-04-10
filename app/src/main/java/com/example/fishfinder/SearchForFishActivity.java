@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fishfinder.util.RestAPIUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -30,6 +32,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,6 +51,14 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     private Button          btnGoToFish;
     private FrameLayout     map_container;
 
+    private TextView tvShowLat;
+    private TextView tvShowLong;
+    private Button btnCaughtFish;
+
+    private String LatitudeClicked;
+    private String LongitudeClicked;
+
+
     // TODO: Add other possible fish location APIs (Found Here: http://www.fishmap.org/technology.html)
     // 1. http://fishnet2.net/api/v1/apihelp.htm#params (Waiting for API Key)
     // 2. https://explorer.natureserve.org/api-docs/    (Haven't found latitude and longitude endpoint, How to pass data: https://stackoverflow.com/questions/52974330/spring-post-method-required-request-body-is-missing)
@@ -57,6 +68,8 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     private final String    spatialAccQuery = "spatialAcc=";
 
     private String apiResult = "";
+    private DecimalFormat locationDF = new DecimalFormat("#.#####");
+
 
     ExecutorService service = Executors.newFixedThreadPool(1);
     @Override
@@ -84,6 +97,11 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         tvGoogleMap     = findViewById(R.id.tvGoogleMap);
         btnGoToFish     = findViewById(R.id.btnGoToFish);
         map_container   = findViewById(R.id.map_container);
+        tvShowLat = findViewById(R.id.tvShowLat);
+        tvShowLong = findViewById(R.id.tvShowLong);
+        btnCaughtFish = findViewById(R.id.btnCaughtFish);
+
+
 
         /* Setup */
         // Display the Name of the fish you are searching locations for
@@ -99,7 +117,8 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
                 // Call NAS API (Finds Locations of Fish)
                 String name = edtSearch.getText().toString();
-                getCordinates(name);
+                getCordinates(name); //This is for calling the markers on the map for each state after the intiial googlemaps initialization.
+
 
                 // Change Intent to Google Map Intent
 //                Intent goToFishLocationActivity = new Intent(v.getContext(), FishLocationActivity.class);
@@ -107,6 +126,20 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
             }
         });
+
+        btnCaughtFish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent goToCaughtFishActivity = new Intent(v.getContext(), CaughtFishActivity.class);
+                goToCaughtFishActivity.putExtra("lat", LatitudeClicked);
+                goToCaughtFishActivity.putExtra("long", LongitudeClicked);
+                //TODO other fill ins like species name and etc... to putExtra
+
+                startActivity(goToCaughtFishActivity);
+            }
+        });
+
+
     }
 
     private void getCordinates(String str) {
@@ -260,14 +293,61 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         mMap = googleMap;
 
         /* Change Map Options */
-        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        googleMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
 
         /* Complete the API call to GET all LatLng's of where a fish can be caught */
         String spatialAcc = "Accurate";
         // TODO: Add search by "commonName" because there are multiple fish in a species
         String urlString = APIBase + speciesQuery + SPECIES + "&" + spatialAccQuery + spatialAcc;   // API call that will get all locations this fish can be caught
         Log.i("Info", "URL: " + urlString);
+
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+
+                String lat = String.valueOf(latLng.latitude);
+                String lng = String.valueOf(latLng.longitude);
+
+                Toast.makeText(SearchForFishActivity.this, "Location:" + latLng.latitude + latLng.longitude, Toast.LENGTH_SHORT).show();
+
+                LatitudeClicked = lat; //update what we clicked so we can pass into next screen intent if that is the case final destination clicked
+                LongitudeClicked = lng;
+
+                String latFormatted = locationDF.format(latLng.latitude); //format the latitude value to 5 decimal places
+                String lngFormatted = locationDF.format(latLng.longitude); //format the longitude value to 5 decimal places to display better in tv
+
+                tvShowLat.setText(latFormatted); //show it in a textview what was clicked onto the screen
+                tvShowLong.setText(lngFormatted); //keeps track of what marker was last clicked and lets user know this is where the fish was caught if he/she intends to submit based on this clicked location
+            }
+        });
+
+        //Setting up the marker click to show which one was clicked
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                String lat = String.valueOf(marker.getPosition().latitude);
+                String lng = String.valueOf(marker.getPosition().longitude);
+                Toast.makeText(SearchForFishActivity.this, "Location:" + lat + lng, Toast.LENGTH_SHORT).show();
+
+                LatitudeClicked = lat; //update what we clicked so we can pass into next screen intent if that is the case final destination clicked
+                LongitudeClicked = lng;
+
+//                tvShowLat.setText(lat); //show it in a textview what was clicked onto the screen
+//                tvShowLong.setText(lng);
+
+                String latFormatted = locationDF.format(marker.getPosition().latitude); //format the latitude value to 5 decimal places
+                String lngFormatted = locationDF.format(marker.getPosition().longitude); //format the longitude value to 5 decimal places to display better in tv
+
+                tvShowLat.setText(latFormatted); //show it in a textview what was clicked onto the screen
+                tvShowLong.setText(lngFormatted); //keeps track of what marker was last clicked and lets user know this is where the fish was caught if he/she intends to submit based on this clicked location
+
+
+                return false;
+            }
+        });
+
 
         /* Add Markers of Fish Locations */
         service.execute(new Runnable() {
@@ -307,7 +387,11 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             }
         });
 
+
+
+
     }
+
 
     /*----------------------*/
 }

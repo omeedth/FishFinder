@@ -40,6 +40,8 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".SettingsPageActivity" />
         <activity android:name=".UserProfileActivity" />
+        <activity android:name=".CaughtFishActivity" />
+        <activity android:name=".ConfirmSavePublishActivity" />
 
 
         <activity android:name=".LoginActivity">

@@ -19,9 +19,10 @@ public class FishCaptureInfo extends FishInfo{
     //These are variables for what user used to catch the fish or user information generated
     private String userComments;
     private String baitUsed;
-    private String weatherCaught;
     private String fishCaughtImage; //a url reference to the image that will be stored in the database, downloaded into database and stored
-    public String timeCaught; //when fish is caught date and time
+    //public String timeCaught; //when fish is caught date and time
+
+    private String weatherCaught; //weather api autofill
 
     public int likes; //amount of likes, determines if it should be displayed in the community page or not.
 
@@ -64,13 +65,13 @@ public class FishCaptureInfo extends FishInfo{
         this.fishCaughtImage = fishCaughtImage;
     }
 
-    public String getTimeCaught() {
-        return timeCaught;
-    }
-
-    public void setTimeCaught(String timeCaught) {
-        this.timeCaught = timeCaught;
-    }
+//    public String getTimeCaught() {
+//        return timeCaught;
+//    }
+//
+//    public void setTimeCaught(String timeCaught) {
+//        this.timeCaught = timeCaught;
+//    }
 
     public int getLikes() {
         return likes;
