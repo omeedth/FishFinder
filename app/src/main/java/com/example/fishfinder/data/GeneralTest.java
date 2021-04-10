@@ -9,6 +9,7 @@ public class GeneralTest {
     String title;
     String latitude;
     String longitude;
+    String imgId; //the number + .jpg in the storagereference database
 
 
     public GeneralTest() {
@@ -17,7 +18,6 @@ public class GeneralTest {
         this.longitude = "";
         this.userId = "";
         this.email = "";
-
     }
 
     public String getTitle() {
@@ -58,5 +58,13 @@ public class GeneralTest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getImgId() {
+        return imgId;
+    }
+
+    public void setImgId(String imgId) {
+        this.imgId = imgId;
     }
 }
