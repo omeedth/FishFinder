@@ -70,7 +70,6 @@ public class CaughtFishActivity extends AppCompatActivity {
                 longitudeVal = "";
 
             } else {
-                Log.i("Info", "Found Species <" + extras.getString("species") + "> in Bundle\'s Extras!");
                 longitudeVal = extras.getString("latitude");
                 latitudeVal = extras.getString("longitude");
 
