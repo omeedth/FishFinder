@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,7 +23,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class CaughtFishActivity extends AppCompatActivity {
@@ -43,7 +47,14 @@ public class CaughtFishActivity extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
+    String userId;
+    String userEmail;
 
+
+
+    private Bitmap bitMapToSave;
+
+    private int databaseSize;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,6 +73,31 @@ public class CaughtFishActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
+
+        userId = firebaseUser.getUid().toString();
+        userEmail = firebaseUser.getEmail().toString();
+
+
+
+
+        firebase.getReference("GeneralTest").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    databaseSize = (int) dataSnapshot.getChildrenCount(); //grab the count for the children.
+                }
+                else {
+                    //if that database does not exist
+                    databaseSize = 0; //init the database size to be 0 so we can use it as an id.
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
 
         if (savedInstanceState == null) {
@@ -97,16 +133,17 @@ public class CaughtFishActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //save to firebase first as a general untracked object that is just part of the database
-                //easier to retrieve it later if the user decides to save.
+                //easier to retrieve it later if the user decides to save officially to their profile and or publish it.
 
                 //a test database
                 GeneralTest toAdd = new GeneralTest();
                 toAdd.setLatitude(latitudeVal);
                 toAdd.setLongitude(longitudeVal);
                 toAdd.setTitle(edtSaveTitle.getText().toString());
-
-
+                toAdd.setUserId(userId);
+                toAdd.setEmail(userEmail);
 //                firebase.getReference("GeneralTest").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd);
 
                 Toast.makeText(v.getContext(), FirebaseAuth.getInstance().getCurrentUser().getUid().toString(), Toast.LENGTH_SHORT).show(); //testing if the user auth makes it here, and yes it does
 
@@ -133,7 +170,8 @@ public class CaughtFishActivity extends AppCompatActivity {
             case TAKE_PICTURE:
                 Bundle bundleData = data.getExtras();
                 Bitmap photo = (Bitmap) bundleData.get("data");
-                imgButtonTakePicture.setImageBitmap(photo);
+                imgButtonTakePicture.setImageBitmap(photo); //set the photo on the imgbutton to show the user the picture that was just taken
+                bitMapToSave = photo; //remember the last photo's bitmap so if we need to save it later we can just call this reference and turn it to byte array to upload to firebase
                 break;
             default:
                 break;
