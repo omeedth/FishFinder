@@ -197,7 +197,7 @@ public class CaughtFishActivity extends AppCompatActivity {
                     byte[] data = baos.toByteArray();
 
 
-                    int theStorageSize = fishImageStorageSize; //trying to make this as atomically as I possible can so reference it now! maybe do a critical section clause here... but threading problem?
+                    int theStorageSize = fishImageStorageSize; //trying to make this as atomically as I possibly can so reference it now! maybe do a critical section clause here... but threading problem?
                     StorageReference newUserImageToUpload = userFishImagesRef.child(String.valueOf(theStorageSize) + ".jpg"); //set the child to save to, its going to be called like 1.jpg or like 2.jpg etc... inside
                     //UserFishImages directory
 
@@ -215,13 +215,13 @@ public class CaughtFishActivity extends AppCompatActivity {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             successfulUpload = true;
                             //update database count now for imagestoragesize
-                            toAdd.setImgId(String.valueOf(theStorageSize)); //add the last reference to jpg
-                            int updateStorageSize = fishImageStorageSize + 1;
-                            firebase.getReference("GeneralDatabaseData/UserFishImagesCount").setValue(updateStorageSize);
+                            toAdd.setImgId(String.valueOf(theStorageSize)); //add the last reference to the object we are to Add to database
+                            int updateStorageSize = fishImageStorageSize + 1; //
+                            firebase.getReference("GeneralDatabaseData/UserFishImagesCount").setValue(updateStorageSize); //update the database for the total amount of User submitted image count
 
-                            firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd);
+                            firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd); //store the fishinfos saved object to database as a record
                             Intent goToConfirmSavePublishActivity = new Intent(v.getContext(), ConfirmSavePublishActivity.class);
-                            startActivity(goToConfirmSavePublishActivity);
+                            startActivity(goToConfirmSavePublishActivity);//go to Save on profile and/or publish on community page
                         }
                     });
 
