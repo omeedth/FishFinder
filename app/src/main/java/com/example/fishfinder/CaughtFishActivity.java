@@ -93,7 +93,7 @@ public class CaughtFishActivity extends AppCompatActivity {
 
         //get the fishImageStorageSize which is updated everytime a user uploads an fishimage as a submission
         //https://stackoverflow.com/questions/52823473/how-to-count-files-image-from-firebase-storage says theres no way to do it with an api call so this has to be done instead
-        firebase.getReference("GeneralDatabaseData/LikesTotalCount").addValueEventListener(new ValueEventListener() {
+        firebase.getReference("GeneralDatabaseData/UserFishImagesCount").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 fishImageStorageSize = dataSnapshot.getValue(Integer.class); //get the integer from this reference
@@ -203,7 +203,7 @@ public class CaughtFishActivity extends AppCompatActivity {
                         //update database count now for imagestoragesize
                         toAdd.setImgId(String.valueOf(theStorageSize));
                         int updateStorageSize = fishImageStorageSize + 1;
-                        firebase.getReference("GeneralDatabaseData/LikesTotalCount").setValue(updateStorageSize);
+                        firebase.getReference("GeneralDatabaseData/UserFishImagesCount").setValue(updateStorageSize);
 
                         firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd);
                         Intent goToConfirmSavePublishActivity = new Intent(v.getContext(), ConfirmSavePublishActivity.class);
