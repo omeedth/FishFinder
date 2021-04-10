@@ -1,6 +1,7 @@
 package com.example.fishfinder;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -119,4 +120,26 @@ public class CaughtFishActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+
+        if (!(resultCode == RESULT_OK)) {
+
+            return;
+        }
+
+        switch (requestCode) {
+            case TAKE_PICTURE:
+                Bundle bundleData = data.getExtras();
+                Bitmap photo = (Bitmap) bundleData.get("data");
+                imgButtonTakePicture.setImageBitmap(photo);
+                break;
+            default:
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+        return;
+    }
 }
