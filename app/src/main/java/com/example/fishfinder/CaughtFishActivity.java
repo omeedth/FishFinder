@@ -60,6 +60,7 @@ public class CaughtFishActivity extends AppCompatActivity {
 
 
     private Bitmap bitMapToSave;
+    private boolean imageTaken;
 
     private int databaseSize;
     private int fishImageStorageSize;
@@ -175,46 +176,90 @@ public class CaughtFishActivity extends AppCompatActivity {
                 //still need to add stuff like, likes = 0, image etc
 
 
-//                firebase.getReference("GeneralTest").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+// //               firebase.getReference("GeneralTest").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+//                //saving images to storage https://firebase.google.com/docs/storage/android/upload-files
+//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                bitMapToSave.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//                byte[] data = baos.toByteArray();
+//
+//
+//                int theStorageSize = fishImageStorageSize; //trying to make this as atomically as I possible can so reference it now! maybe do a critical section clause here... but threading problem?
+//                StorageReference newUserImageToUpload = userFishImagesRef.child(String.valueOf(theStorageSize) + ".jpg"); //set the child to save to, its going to be called like 1.jpg or like 2.jpg etc... inside
+//                //UserFishImages directory
 
-                //saving images to storage https://firebase.google.com/docs/storage/android/upload-files
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bitMapToSave.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                byte[] data = baos.toByteArray();
-
-
-                int theStorageSize = fishImageStorageSize; //trying to make this as atomically as I possible can so reference it now! maybe do a critical section clause here... but threading problem?
-                StorageReference newUserImageToUpload = userFishImagesRef.child(String.valueOf(theStorageSize) + ".jpg"); //set the child to save to, its going to be called like 1.jpg or like 2.jpg etc... inside
-                                                                                                                                //UserFishImages directory
-                UploadTask uploadTask = newUserImageToUpload.putBytes(data); //actually upload it usering UploadTask
-                //inside on successlistener or onfailure update successfulUpload to handle gatekeeping from proceeding to next phase
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        successfulUpload = false;
-                        Toast.makeText(v.getContext(), "Failure to upload " + fishImageStorageSize + ".jpg, Please Try again", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        successfulUpload = true;
-                        //update database count now for imagestoragesize
-                        toAdd.setImgId(String.valueOf(theStorageSize));
-                        int updateStorageSize = fishImageStorageSize + 1;
-                        firebase.getReference("GeneralDatabaseData/UserFishImagesCount").setValue(updateStorageSize);
-
-                        firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd);
-                        Intent goToConfirmSavePublishActivity = new Intent(v.getContext(), ConfirmSavePublishActivity.class);
-                        startActivity(goToConfirmSavePublishActivity);
-                    }
-                });
-
-
-
-
+                //only add it to database if user took a picture of the caught fish
                 //have a boolean to check if image is uploaded successfully, if not dont enter past here
+                if (imageTaken) {
+                    //saving images to storage https://firebase.google.com/docs/storage/android/upload-files
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bitMapToSave.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                    byte[] data = baos.toByteArray();
+
+
+                    int theStorageSize = fishImageStorageSize; //trying to make this as atomically as I possible can so reference it now! maybe do a critical section clause here... but threading problem?
+                    StorageReference newUserImageToUpload = userFishImagesRef.child(String.valueOf(theStorageSize) + ".jpg"); //set the child to save to, its going to be called like 1.jpg or like 2.jpg etc... inside
+                    //UserFishImages directory
+
+                    UploadTask uploadTask = newUserImageToUpload.putBytes(data); //actually upload it usering UploadTask
+                    //inside on successlistener or onfailure update successfulUpload to handle gatekeeping from proceeding to next phase
+                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            successfulUpload = false;
+                            Toast.makeText(v.getContext(), "Failure to upload " + fishImageStorageSize + ".jpg, Please Try again", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            successfulUpload = true;
+                            //update database count now for imagestoragesize
+                            toAdd.setImgId(String.valueOf(theStorageSize)); //add the last reference to jpg
+                            int updateStorageSize = fishImageStorageSize + 1;
+                            firebase.getReference("GeneralDatabaseData/UserFishImagesCount").setValue(updateStorageSize);
+
+                            firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd);
+                            Intent goToConfirmSavePublishActivity = new Intent(v.getContext(), ConfirmSavePublishActivity.class);
+                            startActivity(goToConfirmSavePublishActivity);
+                        }
+                    });
+
+                } else {
+                    //you lying
+                    //thus you shall not pass
+                    Toast.makeText(v.getContext(), "Please upload your caught fish picture by using the Image Button", Toast.LENGTH_SHORT).show();
+                }
+
+
+
+
+
+//                UploadTask uploadTask = newUserImageToUpload.putBytes(data); //actually upload it usering UploadTask
+//                //inside on successlistener or onfailure update successfulUpload to handle gatekeeping from proceeding to next phase
+//                uploadTask.addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        successfulUpload = false;
+//                        Toast.makeText(v.getContext(), "Failure to upload " + fishImageStorageSize + ".jpg, Please Try again", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                        successfulUpload = true;
+//                        //update database count now for imagestoragesize
+//                        toAdd.setImgId(String.valueOf(theStorageSize)); //add the last reference to jpg
+//                        int updateStorageSize = fishImageStorageSize + 1;
+//                        firebase.getReference("GeneralDatabaseData/UserFishImagesCount").setValue(updateStorageSize);
+//
+//                        firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd);
+//                        Intent goToConfirmSavePublishActivity = new Intent(v.getContext(), ConfirmSavePublishActivity.class);
+//                        startActivity(goToConfirmSavePublishActivity);
+//                    }
+//                });
+
+
                 //Toast.makeText(v.getContext(), FirebaseAuth.getInstance().getCurrentUser().getUid().toString(), Toast.LENGTH_SHORT).show(); //testing if the user auth makes it here, and yes it does
 
 //                firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd);
@@ -242,6 +287,7 @@ public class CaughtFishActivity extends AppCompatActivity {
                 Bitmap photo = (Bitmap) bundleData.get("data");
                 imgButtonTakePicture.setImageBitmap(photo); //set the photo on the imgbutton to show the user the picture that was just taken
                 bitMapToSave = photo; //remember the last photo's bitmap so if we need to save it later we can just call this reference and turn it to byte array to upload to firebase
+                imageTaken = true;
                 break;
             default:
                 break;
