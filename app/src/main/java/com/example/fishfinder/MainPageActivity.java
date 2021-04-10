@@ -13,6 +13,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class MainPageActivity extends AppCompatActivity {
 
     //Components
@@ -21,6 +24,11 @@ public class MainPageActivity extends AppCompatActivity {
     private Button btnGoToProfile;
     private ListView lvCommunity;
     private Button btnLogout;
+
+    FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
+
+
 
 
     @Override
@@ -33,6 +41,10 @@ public class MainPageActivity extends AppCompatActivity {
         btnGoToProfile = (Button) findViewById(R.id.btnGoToProfile);
         lvCommunity = (ListView) findViewById(R.id.lvCommunity);
         btnLogout = (Button) findViewById(R.id.btnLogout);
+
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
 
         /* Listeners */
         btnSearchFish.setOnClickListener(new View.OnClickListener() {
@@ -54,6 +66,15 @@ public class MainPageActivity extends AppCompatActivity {
                 Intent goToProfile = new Intent(v.getContext(), UserProfileActivity.class);
                 startActivity(goToProfile);
 
+            }
+        });
+
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut(); //signs out with firebase
+                Intent i = new Intent(v.getContext(),  LoginActivity.class);
+                startActivity(i); //sign out and go back to main screen to check
             }
         });
 

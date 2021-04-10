@@ -131,8 +131,8 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             @Override
             public void onClick(View v) {
                 Intent goToCaughtFishActivity = new Intent(v.getContext(), CaughtFishActivity.class);
-                goToCaughtFishActivity.putExtra("lat", LatitudeClicked);
-                goToCaughtFishActivity.putExtra("long", LongitudeClicked);
+                goToCaughtFishActivity.putExtra("latitude", LatitudeClicked);
+                goToCaughtFishActivity.putExtra("longitude", LongitudeClicked);
                 //TODO other fill ins like species name and etc... to putExtra
 
                 startActivity(goToCaughtFishActivity);
