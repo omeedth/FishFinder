@@ -27,6 +27,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.ByteArrayOutputStream;
 
 
 public class CaughtFishActivity extends AppCompatActivity {
@@ -55,6 +59,9 @@ public class CaughtFishActivity extends AppCompatActivity {
     private Bitmap bitMapToSave;
 
     private int databaseSize;
+    private int fishImageStorageSize;
+
+    private boolean successfulUpload;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,11 +82,29 @@ public class CaughtFishActivity extends AppCompatActivity {
         firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
 
         userId = firebaseUser.getUid().toString();
-        userEmail = firebaseUser.getEmail().toString();
+        userEmail = firebaseUser.getEmail().toString(); //just get some data we need
+
+        FirebaseStorage storage = FirebaseStorage.getInstance(); //get our firebase storage instance
+        StorageReference storageRef = storage.getReference(); // get a reference to our storage at firebase
+        StorageReference userFishImagesRef = storageRef.child("UserFishImages" + "/"); //set the directory to reference a node called UserFishImages
+
+        //get the fishImageStorageSize which is updated everytime a user uploads an fishimage as a submission
+        //https://stackoverflow.com/questions/52823473/how-to-count-files-image-from-firebase-storage says theres no way to do it with an api call so this has to be done instead
+        firebase.getReference("GeneralDatabaseData/LikesTotalCount").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                fishImageStorageSize = dataSnapshot.getValue(Integer.class); //get the integer from this reference
+                Toast.makeText(CaughtFishActivity.this, "" + fishImageStorageSize, Toast.LENGTH_SHORT).show(); //check if it really retrieved this data.
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
-
-
+        //this is used to grab the count for user uploaded records
         firebase.getReference("GeneralTest").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -91,12 +116,11 @@ public class CaughtFishActivity extends AppCompatActivity {
                     databaseSize = 0; //init the database size to be 0 so we can use it as an id.
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
+
 
 
 
@@ -135,6 +159,9 @@ public class CaughtFishActivity extends AppCompatActivity {
                 //save to firebase first as a general untracked object that is just part of the database
                 //easier to retrieve it later if the user decides to save officially to their profile and or publish it.
 
+
+                successfulUpload = false;
+
                 //a test database
                 GeneralTest toAdd = new GeneralTest();
                 toAdd.setLatitude(latitudeVal);
@@ -142,9 +169,22 @@ public class CaughtFishActivity extends AppCompatActivity {
                 toAdd.setTitle(edtSaveTitle.getText().toString());
                 toAdd.setUserId(userId);
                 toAdd.setEmail(userEmail);
+                //still need to add stuff like, likes = 0, image etc
+
+
 //                firebase.getReference("GeneralTest").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd);
 
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitMapToSave.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] data = baos.toByteArray();
+
+                //UploadTask uploadTask =
+
+                //inside on successlistener  or onfailure update successfulUpload to handle gatekeeping from proceeding to next phase
+
+
+                //have a boolean to check if image is uploaded successfully, if not dont enter past here
                 Toast.makeText(v.getContext(), FirebaseAuth.getInstance().getCurrentUser().getUid().toString(), Toast.LENGTH_SHORT).show(); //testing if the user auth makes it here, and yes it does
 
                 Intent goToConfirmSavePublishActivity = new Intent(v.getContext(), ConfirmSavePublishActivity.class);
