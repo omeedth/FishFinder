@@ -90,7 +90,7 @@ public class CaughtFishActivity extends AppCompatActivity {
         edtSaveLength = (EditText) findViewById(R.id.edtSaveLength);
         edtSaveSpecies = (EditText) findViewById(R.id.edtSaveSpecies);
         edtSaveGenus = (EditText) findViewById(R.id.edtSaveGenus);
-        edtSaveBait = (EditText) findViewById(R.id.edtSaveSpecies);
+        edtSaveBait = (EditText) findViewById(R.id.edtSaveBait);
         edtSaveBodyShape = (EditText) findViewById(R.id.edtSaveBodyShape);
         edtSaveUserComments = (EditText) findViewById(R.id.edtSaveUserComments);
 
@@ -250,7 +250,26 @@ public class CaughtFishActivity extends AppCompatActivity {
                             firebase.getReference("GeneralDatabaseData/UserFishImagesCount").setValue(updateStorageSize); //update the database for the total amount of User submitted image count
 
                             firebase.getReference("GeneralTest").child(String.valueOf(databaseSize)).setValue(toAdd); //store the fishinfos saved object to database as a record
+
+                            //toss in all the required intents to next page in case it is needed to be saved to profile or published onto main page
                             Intent goToConfirmSavePublishActivity = new Intent(v.getContext(), ConfirmSavePublishActivity.class);
+
+                             //tossing everything to next page
+                            goToConfirmSavePublishActivity.putExtra("imgId", toAdd.getImgId());
+                            goToConfirmSavePublishActivity.putExtra("latitude", toAdd.getLatitude());
+                            goToConfirmSavePublishActivity.putExtra("longitude", toAdd.getLongitude());
+                            goToConfirmSavePublishActivity.putExtra("title", toAdd.getTitle());
+                            goToConfirmSavePublishActivity.putExtra("userId", toAdd.getUserId());
+                            goToConfirmSavePublishActivity.putExtra("email", toAdd.getEmail());
+                            goToConfirmSavePublishActivity.putExtra("fishname", toAdd.getFishname());
+                            goToConfirmSavePublishActivity.putExtra("weight", toAdd.getWeight());
+                            goToConfirmSavePublishActivity.putExtra("length", toAdd.getLength());
+                            goToConfirmSavePublishActivity.putExtra("species", toAdd.getSpecies());
+                            goToConfirmSavePublishActivity.putExtra("genus", toAdd.getGenus());
+                            goToConfirmSavePublishActivity.putExtra("bait", toAdd.getBait());
+                            goToConfirmSavePublishActivity.putExtra("bodyshape", toAdd.getBodyshape());
+                            goToConfirmSavePublishActivity.putExtra("usercomment", toAdd.getUsercomment());
+
                             startActivity(goToConfirmSavePublishActivity);//go to Save on profile and/or publish on community page
                         }
                     });
