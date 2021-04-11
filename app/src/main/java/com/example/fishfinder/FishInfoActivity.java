@@ -129,7 +129,7 @@ public class FishInfoActivity extends AppCompatActivity {
                 FishInfo fishInfo = (FishInfo) parent.getItemAtPosition(position);
 
                 Intent goToSearchForFishActivity = new Intent(view.getContext(), SearchForFishActivity.class);
-                goToSearchForFishActivity.putExtra("species", fishInfo.getSpecies());
+                goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
 
                 //based on item add info to intent
                 startActivity(goToSearchForFishActivity);
@@ -231,6 +231,7 @@ public class FishInfoActivity extends AppCompatActivity {
                 // Fill FishInfo Object based on JSON
                 JSONObject element   = results.getJSONObject(i);
                 fishInfo.setSpecies(element.getString("Species"));
+                fishInfo.setGenus(element.getString("Genus"));
                 fishInfo.setFBname(element.getString("FBname"));
                 fishInfo.setBodyShapeI(element.getString("BodyShapeI"));
 

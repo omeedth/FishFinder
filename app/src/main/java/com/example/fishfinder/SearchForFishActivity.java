@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.fishfinder.data.FishInfo;
 import com.example.fishfinder.util.RestAPIUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,8 +42,11 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
     /* Variables */
     private final String DEFAULT_SPECIES = "cyanellus"; // TODO: Change the default
+    private final String DEFAULT_GENUS = "Lepomis";
     private String SPECIES;
+    private String GENUS;
     private GoogleMap mMap;
+    private FishInfo fishInfo;
 
     //Components
     private TextView        textViewSpecies;
@@ -64,8 +68,12 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     // 2. https://explorer.natureserve.org/api-docs/    (Haven't found latitude and longitude endpoint, How to pass data: https://stackoverflow.com/questions/52974330/spring-post-method-required-request-body-is-missing)
     // NAS API (Find coordinates of fish) - DOCUMENTATION: https://nas.er.usgs.gov/api/documentation.aspx
     private final String    APIBase = "https://nas.er.usgs.gov/api/v2/occurrence/search?";
+    private final String    genusQuery = "genus=";
     private final String    speciesQuery = "species=";
     private final String    spatialAccQuery = "spatialAcc=";
+    private final String    ACCURATE_SPATIAL_ACCURACY = "Accurate";
+    private final String    APPROXIMATE_SPATIAL_ACCURACY = "Approximate";
+    private final String    CENTROID_SPATIAL_ACCURACY = "Centroid";
 
     private String apiResult = "";
     private DecimalFormat locationDF = new DecimalFormat("#.#####");
@@ -83,12 +91,16 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
                 SPECIES = DEFAULT_SPECIES;
+                GENUS = DEFAULT_GENUS;
             } else {
-                Log.i("Info", "Found Species <" + extras.getString("species") + "> in Bundle\'s Extras!");
-                SPECIES = extras.getString("species");
+//                Log.i("Info", "Found Species <" + extras.getString("species") + "> in Bundle\'s Extras!");
+//                SPECIES = extras.getString("species");
+                fishInfo = (FishInfo) extras.getSerializable("fishInfo");
+                SPECIES = fishInfo.getSpecies();
+                GENUS = fishInfo.getGenus();
             }
         } else {
-//            newString= (String) savedInstanceState.getSerializable("STRING_I_NEED");
+//            fishInfo = (FishInfo) savedInstanceState.getSerializable("fishInfo");
         }
 
         /* Initialize Components */
@@ -105,7 +117,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
         /* Setup */
         // Display the Name of the fish you are searching locations for
-        textViewSpecies.setText("Searching for: " + SPECIES);
+        textViewSpecies.setText("Searching for: " + fishInfo.getFBname());
 
         // Adds the map Fragment inside the map_container
         addMapFragment();
@@ -297,9 +309,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         mMap.getUiSettings().setZoomGesturesEnabled(true);
 
         /* Complete the API call to GET all LatLng's of where a fish can be caught */
-        String spatialAcc = "Accurate";
+        String spatialAcc = ACCURATE_SPATIAL_ACCURACY; // TODO: Decide which spatialAcc method to use (filter/settings)
         // TODO: Add search by "commonName" because there are multiple fish in a species
-        String urlString = APIBase + speciesQuery + SPECIES + "&" + spatialAccQuery + spatialAcc;   // API call that will get all locations this fish can be caught
+        String urlString = APIBase + genusQuery + GENUS + "&" + speciesQuery + SPECIES + "&" + spatialAccQuery + spatialAcc;   // API call that will get all locations this fish can be caught
         Log.i("Info", "URL: " + urlString);
 
 

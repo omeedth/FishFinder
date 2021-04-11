@@ -1,11 +1,14 @@
 package com.example.fishfinder.data;
 
-public class FishInfo {
+import java.io.Serializable;
+
+public class FishInfo implements Serializable {
 
     /* Variables - (Variable names are same as JSON keys) */
     private String common_name; // From USGS NAS API
     private String FBname;      // From Fish Base API
     private String Species;
+    private String Genus;
     private String BodyShapeI;
     private Double Length;
     private Double Weight;
@@ -20,6 +23,7 @@ public class FishInfo {
         common_name = null;
         FBname = null;
         Species = null;
+        Genus = null;
         BodyShapeI = null;
         Length = null;
         Weight = null;
@@ -32,6 +36,10 @@ public class FishInfo {
 
     public String getSpecies() {
         return Species;
+    }
+
+    public String getGenus() {
+        return Genus;
     }
 
     public String getCommon_name() {
@@ -78,6 +86,10 @@ public class FishInfo {
 
     public void setSpecies(String species) {
         this.Species = species;
+    }
+
+    public void setGenus(String genus) {
+        Genus = genus;
     }
 
     public void setCommon_name(String common_name) {
