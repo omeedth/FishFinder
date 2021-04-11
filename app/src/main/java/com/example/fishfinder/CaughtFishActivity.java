@@ -45,6 +45,16 @@ public class CaughtFishActivity extends AppCompatActivity {
     private EditText edtSaveLatitude;
     private EditText edtSaveLongitude;
 
+    private EditText edtSaveWeight;
+    private EditText edtSaveLength;
+    private EditText edtSaveSpecies;
+    private EditText edtSaveGenus;
+    private EditText edtSaveBait;
+    private EditText edtSaveBodyShape;
+    private EditText edtSaveUserComments;
+
+
+
     private final int TAKE_PICTURE = 9990;
 
     private String latitudeVal;
@@ -76,9 +86,19 @@ public class CaughtFishActivity extends AppCompatActivity {
         edtSaveFishName = (EditText) findViewById(R.id.edtSaveFishName);
         imgButtonTakePicture = (ImageButton) findViewById(R.id.imgButtonTakePicture);
         btnSubmitSave = (Button) findViewById(R.id.btnSubmitSave);
+        edtSaveWeight = (EditText) findViewById(R.id.edtSaveWeight);
+        edtSaveLength = (EditText) findViewById(R.id.edtSaveLength);
+        edtSaveSpecies = (EditText) findViewById(R.id.edtSaveSpecies);
+        edtSaveGenus = (EditText) findViewById(R.id.edtSaveGenus);
+        edtSaveBait = (EditText) findViewById(R.id.edtSaveSpecies);
+        edtSaveBodyShape = (EditText) findViewById(R.id.edtSaveBodyShape);
+        edtSaveUserComments = (EditText) findViewById(R.id.edtSaveUserComments);
+
+
 
         edtSaveLatitude = (EditText) findViewById(R.id.edtSaveLatitude);
         edtSaveLongitude = (EditText) findViewById(R.id.edtSaveLongitude);
+
 
         firebase = FirebaseDatabase.getInstance(); //get the root node point of the database, this is so we can get the references based on the root node to get the desired data references
 
@@ -166,13 +186,23 @@ public class CaughtFishActivity extends AppCompatActivity {
 
                 successfulUpload = false;
 
-                //a test database
+                //a database using GeneralTest as the object to inject to firebase
+                //just adding all the user submitted values to this class
                 GeneralTest toAdd = new GeneralTest();
                 toAdd.setLatitude(latitudeVal);
                 toAdd.setLongitude(longitudeVal);
                 toAdd.setTitle(edtSaveTitle.getText().toString());
                 toAdd.setUserId(userId);
                 toAdd.setEmail(userEmail);
+                toAdd.setFishname(edtSaveFishName.getText().toString());
+                toAdd.setWeight(edtSaveWeight.getText().toString());
+                toAdd.setLength(edtSaveLength.getText().toString());
+                toAdd.setSpecies(edtSaveSpecies.getText().toString());
+                toAdd.setGenus(edtSaveGenus.getText().toString());
+                toAdd.setBait(edtSaveBait.getText().toString());
+                toAdd.setBodyshape(edtSaveBodyShape.getText().toString());
+                toAdd.setUsercomment(edtSaveUserComments.getText().toString());
+
                 //still need to add stuff like, likes = 0, image etc
 
 
