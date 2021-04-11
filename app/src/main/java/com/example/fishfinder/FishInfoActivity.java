@@ -233,6 +233,7 @@ public class FishInfoActivity extends AppCompatActivity {
                 // Fill FishInfo Object based on JSON
                 JSONObject element   = results.getJSONObject(i);
                 fishInfo.setSpecies(element.getString("Species"));
+                fishInfo.setGenus(element.getString("Genus"));
                 fishInfo.setFBname(element.getString("FBname"));
                 fishInfo.setBodyShapeI(element.getString("BodyShapeI"));
 

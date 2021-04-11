@@ -39,7 +39,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
     /* Variables */
     private final String DEFAULT_SPECIES = "cyanellus"; // TODO: Change the default
+    private final String DEFAULT_GENUS = "Lepomis";
     private String SPECIES;
+    private String GENUS;
     private GoogleMap mMap;
     private FishInfo fishInfo;
 
@@ -51,12 +53,17 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     private FrameLayout     map_container;
 
     // TODO: Add other possible fish location APIs (Found Here: http://www.fishmap.org/technology.html)
+    // How to search for fish (https://www.hierarchystructure.com/animal-taxonomy-hierarchy/) Genus + Species is a unique combination
     // 1. http://fishnet2.net/api/v1/apihelp.htm#params (Waiting for API Key)
     // 2. https://explorer.natureserve.org/api-docs/    (Haven't found latitude and longitude endpoint, How to pass data: https://stackoverflow.com/questions/52974330/spring-post-method-required-request-body-is-missing)
     // NAS API (Find coordinates of fish) - DOCUMENTATION: https://nas.er.usgs.gov/api/documentation.aspx
     private final String    APIBase = "https://nas.er.usgs.gov/api/v2/occurrence/search?";
+    private final String    genusQuery = "genus=";
     private final String    speciesQuery = "species=";
     private final String    spatialAccQuery = "spatialAcc=";
+    private final String    ACCURATE_SPATIAL_ACCURACY = "Accurate";
+    private final String    APPROXIMATE_SPATIAL_ACCURACY = "Approximate";
+    private final String    CENTROID_SPATIAL_ACCURACY = "Centroid";
 
     private String apiResult = "";
 
@@ -72,10 +79,13 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
                 SPECIES = DEFAULT_SPECIES;
+                GENUS = DEFAULT_GENUS;
             } else {
 //                Log.i("Info", "Found Species <" + extras.getString("species") + "> in Bundle\'s Extras!");
 //                SPECIES = extras.getString("species");
                 fishInfo = (FishInfo) extras.getSerializable("fishInfo");
+                SPECIES = fishInfo.getSpecies();
+                GENUS = fishInfo.getGenus();
             }
         } else {
 //            fishInfo = (FishInfo) savedInstanceState.getSerializable("fishInfo");
@@ -149,7 +159,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 //            }
 //        }
 
-        String urlString = String.format("%sspecies=%s&state=%s", APIBase, SPECIES, state);
+        String urlString = String.format("%sgenus=%s&species=%s&state=%s", APIBase, GENUS, SPECIES, state);
 
         /* Debugging */
         Log.i("Debug", urlString);
@@ -267,9 +277,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         googleMap.getUiSettings().setZoomGesturesEnabled(true);
 
         /* Complete the API call to GET all LatLng's of where a fish can be caught */
-        String spatialAcc = "Accurate";
+        String spatialAcc = ACCURATE_SPATIAL_ACCURACY; // TODO: Decide which spatialAcc method to use (filter/settings)
         // TODO: Add search by "commonName" because there are multiple fish in a species
-        String urlString = APIBase + speciesQuery + SPECIES + "&" + spatialAccQuery + spatialAcc;   // API call that will get all locations this fish can be caught
+        String urlString = APIBase + genusQuery + GENUS + "&" + speciesQuery + SPECIES + "&" + spatialAccQuery + spatialAcc;   // API call that will get all locations this fish can be caught
         Log.i("Info", "URL: " + urlString);
 
         /* Add Markers of Fish Locations */
