@@ -154,27 +154,27 @@ public class GeneralTest {
         this.usercomment = usercomment;
     }
 
-    public boolean isFreshwater() {
-        return freshwater;
-    }
-
-    public void setFreshwater(boolean freshwater) {
-        this.freshwater = freshwater;
-    }
-
-    public boolean isSaltwater() {
-        return saltwater;
-    }
-
-    public void setSaltwater(boolean saltwater) {
-        this.saltwater = saltwater;
-    }
-
-    public String getWeather() {
-        return weather;
-    }
-
-    public void setWeather(String weather) {
-        this.weather = weather;
-    }
+//    public boolean isFreshwater() {
+//        return freshwater;
+//    }
+//
+//    public void setFreshwater(boolean freshwater) {
+//        this.freshwater = freshwater;
+//    }
+//
+//    public boolean isSaltwater() {
+//        return saltwater;
+//    }
+//
+//    public void setSaltwater(boolean saltwater) {
+//        this.saltwater = saltwater;
+//    }
+//
+//    public String getWeather() {
+//        return weather;
+//    }
+//
+//    public void setWeather(String weather) {
+//        this.weather = weather;
+//    }
 }
