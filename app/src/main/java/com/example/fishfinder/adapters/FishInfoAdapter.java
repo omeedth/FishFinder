@@ -3,6 +3,8 @@ package com.example.fishfinder.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fishfinder.R;
@@ -44,29 +47,42 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         // If there is already a View then just return it (Didn't Do Anything)
-        View v;
-//        if (parent.getChildCount() > position && (v = parent.getChildAt(position)) != null) {
-//            Log.i("Info", "View: " + v.toString());
-//            return v;
-//        }
-//        Log.i("Info", "No View! Making...");
+        // We only need to inflate the layout if the layout is not present (it is expensive to keep doing this)
+        View row;
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            row = inflater.inflate(R.layout.list_view_fish_info, parent, false);
+        } else {
+            row = convertView;
+        }
 
         // If there is no View then create a new View and inflate it with the appropriate components
-        v = convertView;
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        v = inflater.inflate(R.layout.list_view_fish_info, null);
-        TextView textView = (TextView) v.findViewById(R.id.textView);
-        ImageView imageView = (ImageView) v.findViewById(R.id.imageView);
+        // TODO: Make an Image object that holds the image so we don't have to regrab the image (Check professor's CustomListAdapter example code)
+//        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        row = inflater.inflate(R.layout.list_view_fish_info, null);
+
+        /* Initialize Components from custom list view XML */
+        TextView textView = (TextView) row.findViewById(R.id.textView);
+        ImageView imageView = (ImageView) row.findViewById(R.id.imageView);
+
+        // Retrieve name from the FishInfo object and set that to text of textView
         textView.setText(fishInfoList.get(position).getFBname());
 
-        // Download Image Task
-        String img_url = fishInfoList.get(position).getImage();
-        new DownloadImageTask(imageView).execute(img_url);
+        // Download Image Task - TODO: Optimize this by not re-downloading the image if we already have the image downloaded
+        if(hasImage(imageView)) {
+            // Image already downloaded... Do Nothing
+            Log.i("Debug","Position: " + position + ", Image Already Exists!");
+        } else {
+            // Image not included in the ImageView... Download the Image
+            String img_url = fishInfoList.get(position).getImage();
+            new DownloadImageTask(imageView).execute(img_url);
+        }
 
-        return v;
+        return row;
 
     }
 
+    // TODO: stop using depreciated AsyncTask
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
 
@@ -97,6 +113,17 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
         protected void onPostExecute(Bitmap result) {
             bmImage.setImageBitmap(result);
         }
+    }
+
+    private boolean hasImage(@NonNull ImageView view) {
+        Drawable drawable = view.getDrawable();
+        boolean hasImage = (drawable != null);
+
+        if (hasImage && (drawable instanceof BitmapDrawable)) {
+            hasImage = ((BitmapDrawable)drawable).getBitmap() != null;
+        }
+
+        return hasImage;
     }
 
 }

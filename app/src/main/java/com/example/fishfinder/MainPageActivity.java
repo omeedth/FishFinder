@@ -1,8 +1,10 @@
 package com.example.fishfinder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -11,58 +13,38 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.fishfinder.data.FishInfo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainPageActivity extends AppCompatActivity {
 
-    /* Components */
+    //Components
     private Button btnSearchFish;
     private TextView tvMainPage;
     private Button btnGoToProfile;
     private ListView lvCommunity;
     private Button btnLogout;
 
-    /* Variables */
-    private FirebaseUser user;
-    private FirebaseAuth mAuth;
+    FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
 
-        /* Retrieve Info from the Bundle */
-        if (savedInstanceState == null) {
-            Bundle extras = getIntent().getExtras();
-            if (extras != null) {
-//                user = (FirebaseUser) extras.getSerializable("user");
-//                Log.d("Debugging", "User: " + user);
-            } else {
-
-            }
-        }
-
-        /* Initialize Variables */
-        mAuth = FirebaseAuth.getInstance();
-
-        // Go back to LoginPage if not signed in
-        user = mAuth.getCurrentUser();
-        if (user == null) {
-            Intent goToLoginActivity = new Intent(this, LoginActivity.class);
-            startActivity(goToLoginActivity);
-        } else {
-            Toast.makeText(this, "Welcome " + user.getEmail(),
-                    Toast.LENGTH_LONG).show();
-        }
-
-        /* Initialize Components */
         btnSearchFish = (Button) findViewById(R.id.btnSearchFish);
         tvMainPage = (TextView) findViewById(R.id.tvMainPage);
         btnGoToProfile = (Button) findViewById(R.id.btnGoToProfile);
         lvCommunity = (ListView) findViewById(R.id.lvCommunity);
         btnLogout = (Button) findViewById(R.id.btnLogout);
+
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
 
         /* Listeners */
         btnSearchFish.setOnClickListener(new View.OnClickListener() {
@@ -77,5 +59,51 @@ public class MainPageActivity extends AppCompatActivity {
             }
         });
 
+        btnGoToProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent goToProfile = new Intent(v.getContext(), UserProfileActivity.class);
+                startActivity(goToProfile);
+
+            }
+        });
+
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut(); //signs out with firebase
+                Intent i = new Intent(v.getContext(),  LoginActivity.class);
+                startActivity(i); //sign out and go back to main screen to check
+            }
+        });
+
+
+
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+//        return super.onCreateOptionsMenu(menu);   //get rid of default behavior.
+
+        // Inflate the menu; this adds items to the action bar
+        getMenuInflater().inflate(R.menu.simple_menu, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.mnu_zero) { //replacing given menu code with new ones
+            Toast.makeText(getBaseContext(), "Settings", Toast.LENGTH_LONG).show();
+            Intent goToSettings = new Intent(getBaseContext(), SettingsPageActivity.class);
+            startActivity(goToSettings);
+
+        }
+
+            return true;
+        }
 }

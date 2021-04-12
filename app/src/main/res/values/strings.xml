@@ -22,4 +22,28 @@
     <!-- Fish Info Page -->
     <string name="i_caught_fish">I Caught The Fish!</string>
     <string name="title_activity_fish_location">Map</string>
+    <string name="google_api_key1">AIzaSyBUQpGImgGhLK5u4g_RWx-PgLyWprHvLEs</string>
+    <string name="sign_in_email">Email</string>
+    <string name="i_caught_the_fish">I Caught the Fish!</string>
+    <string name="latitude">latitude</string>
+    <string name="latitude_longitude">Latitude Longitude</string>
+    <string name="longitude">longitude</string>
+    <string name="i_caught_the_fish_title">I Caught The Fish!</string>
+    <string name="save_to_profile">Save To Profile?</string>
+    <string name="publish_to_community_page">Publish To Community Page?</string>
+    <string name="button">Button</string>
+    <string name="save_confirm">Save!</string>
+    <string name="publish_confirm">Publish!</string>
+    <string name="confirm_save_finish">Confirm</string>
+    <string name="image_fish_upload">Image Fish Upload</string>
+    <string name="submit">Submit</string>
+    <string name="catch_title">Catch Title</string>
+    <string name="length_m">Length: m</string>
+    <string name="weight_lb">Weight:Lb</string>
+    <string name="fish_name">Fish Name</string>
+    <string name="species">Species</string>
+    <string name="genus">Genus</string>
+    <string name="bait">Bait</string>
+    <string name="body_shape">Body Shape</string>
+    <string name="user_comments">User Comments</string>
 </resources>

@@ -3,135 +3,109 @@ package com.example.fishfinder;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.fishfinder.data.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+
+import java.util.regex.Pattern;
 
 public class LoginActivity extends AppCompatActivity {
 
-    /* Variables */
-    private static final String TAG = "EmailPassword";
-    private FirebaseAuth mAuth;
-    private Context ctx;
-
-    /* Components */
-    private EditText edtUsername;
-    private EditText edtPassword;
     private Button bntSignIn;
     private Button btnRegister;
+    //DatabaseReference firebase;
+
+    FirebaseAuth mAuth; //Initilize authenticaiton with firebase
+
+    private EditText edtUsername;
+    private EditText edtPassword;
+
+    private String email;
+    private String password;
+
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        /* Initialize Variables */
-
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
-
-        ctx = this.getBaseContext();
-
-        /* Initialize Components */
         bntSignIn = (Button) findViewById(R.id.btnSignIn);
         btnRegister = (Button) findViewById(R.id.btnRegister);
-        edtUsername = (EditText) findViewById(R.id.edtUsername);
+
+        edtUsername = (EditText) findViewById(R.id.edtUsername); //Its actually an email input now. Not Username but for convenience just keep the ids the same with the button
         edtPassword = (EditText) findViewById(R.id.edtPassword);
+
+        mAuth = FirebaseAuth.getInstance(); //init firebase auth instance
 
         bntSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                // Sign In TODO: Add checks to see if the EditText objects have the right values
-                String username = edtUsername.getText().toString();
-                String password = edtPassword.getText().toString();
-                signIn(username, password);
-
 //                Intent intent = new Intent(v.getContext(), MainPageActivity.class);
 //                startActivity(intent);
-
+                userLogin();
             }
         });
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // Switch To MainPage
                 Intent goToRegisterPage = new Intent(v.getContext(), RegisterActivity.class);
                 startActivity(goToRegisterPage);
             }
         });
     }
 
-    // Check to see if the user is already signed in onStart.
-    // If the user is authenticated, direct them to the MainPage
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            reload();
+
+    public void userLogin() {
+
+        if (edtUsername.getText().toString().trim().isEmpty()) {
+            edtUsername.setError("Invalid Email!");
+            return;
         }
-    }
 
-    private void signIn(String email, String password) {
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+        //if not a proper email formating deny entry display error
+        if (!Patterns.EMAIL_ADDRESS.matcher(edtUsername.getText().toString().trim()).matches()) {
+            edtUsername.setError("Invalid Email!");
+            return;
+        }
 
-                            // Switch to MainPage
-                            Intent goToMainPageActivity = new Intent(ctx, MainPageActivity.class);
-//                            Bundle loadInfo = new Bundle();
-//                            loadInfo.putSerializable("user", user);
-                            startActivity(goToMainPageActivity);
+        if (edtPassword.getText().toString().isEmpty()) {
+            edtPassword.setError("Invalid Password!");
+            return;
+        }
 
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
-                    }
-                });
-    }
+        email = edtUsername.getText().toString().trim();
+        password = edtPassword.getText().toString();
 
-    private void sendEmailVerification() {
-        // Send verification email
-        final FirebaseUser user = mAuth.getCurrentUser();
-        user.sendEmailVerification()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // Email sent
-                    }
-                });
-    }
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Intent intent = new Intent(LoginActivity.this, MainPageActivity.class);
 
-    private void reload() { }
 
-    private void updateUI(FirebaseUser user) {
+                    startActivity(intent);
+                    Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(LoginActivity.this, "Login Failed, Check Login Information", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
 
     }
-
-
 }

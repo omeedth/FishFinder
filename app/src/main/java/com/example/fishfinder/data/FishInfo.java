@@ -8,6 +8,7 @@ public class FishInfo implements Serializable {
     private String common_name; // From USGS NAS API
     private String FBname;      // From Fish Base API
     private String Species;
+    private String Genus;
     private String BodyShapeI;
     private Double Length;
     private Double Weight;
@@ -22,6 +23,7 @@ public class FishInfo implements Serializable {
         common_name = null;
         FBname = null;
         Species = null;
+        Genus = null;
         BodyShapeI = null;
         Length = null;
         Weight = null;
@@ -34,6 +36,10 @@ public class FishInfo implements Serializable {
 
     public String getSpecies() {
         return Species;
+    }
+
+    public String getGenus() {
+        return Genus;
     }
 
     public String getCommon_name() {
@@ -80,6 +86,10 @@ public class FishInfo implements Serializable {
 
     public void setSpecies(String species) {
         this.Species = species;
+    }
+
+    public void setGenus(String genus) {
+        Genus = genus;
     }
 
     public void setCommon_name(String common_name) {
