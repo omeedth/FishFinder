@@ -66,7 +66,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     // 1. http://fishnet2.net/api/v1/apihelp.htm#params (Waiting for API Key)
     // 2. https://explorer.natureserve.org/api-docs/    (Haven't found latitude and longitude endpoint, How to pass data: https://stackoverflow.com/questions/52974330/spring-post-method-required-request-body-is-missing)
     // NAS API (Find coordinates of fish) - DOCUMENTATION: https://nas.er.usgs.gov/api/documentation.aspx
-    private final String    APIBase = "https://nas.er.usgs.gov/api/v2/occurrence/search?";
+    private final String    APIBase = "https://nas.er.usgs.gov/api/v2/occurrence/search?";  // TODO: Add Limit to add markers incrementally
     private final String    genusQuery = "genus=";
     private final String    speciesQuery = "species=";
     private final String    spatialAccQuery = "spatialAcc=";
@@ -79,13 +79,14 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
 
     ExecutorService service = Executors.newFixedThreadPool(1);
+
+    // TODO: Add textbox for users to decide radius of markers on the map
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_for_fish);
 
         /* Get Bundle Info */
-        // TODO: Make FishInfo Object Serializable, and send the whole Object over
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {

@@ -100,6 +100,7 @@ public class FishListActivity extends AppCompatActivity {
             if (fishNameEntered.length() > 0) {
 
 //                RestAPIUtil.get(FishBaseAPIBase + FishBaseAPISpecies);
+                // TODO: get the number of records in FishBase by calling the API
                 int endPoint = 34571;   // How many records will we try to search for (Max Value means going through all records) // HARDCODED TO MAX RESULTS RIGHT NOW
                 int offset = 0;         // Where we start searching from
                 int batchSize = 1000;    // How many records we search per query

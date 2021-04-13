@@ -69,6 +69,8 @@ public class FishInfoActivity extends AppCompatActivity {
         String img_url = fishInfo.getImage();
         new DownloadImageTask(imageViewFish).execute(img_url);
 
+        // TODO: Make layout look better
+        // TODO: Fix Comments overflow problem
         textViewFBNameInfo.setText(fishInfo.getFBname());
         textViewSpeciesInfo.setText(fishInfo.getSpecies());
         textViewGenusInfo.setText(fishInfo.getGenus());
