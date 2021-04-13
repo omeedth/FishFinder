@@ -1,6 +1,5 @@
 package com.example.fishfinder;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -12,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,17 +24,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.SphericalUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,13 +48,15 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     //Components
     private TextView        textViewSpecies;
     private EditText        edtSearch;
-    private TextView        tvGoogleMap;
+//    private TextView        tvGoogleMap; // TODO: Get rid of later
     private Button          btnGoToFish;
     private FrameLayout     map_container;
 
     private TextView tvShowLat;
     private TextView tvShowLong;
     private Button btnCaughtFish;
+
+    private ProgressBar progressBarLoadResults;
 
     private String LatitudeClicked;
     private String LongitudeClicked;
@@ -106,18 +105,19 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         /* Initialize Components */
         textViewSpecies = findViewById(R.id.textViewSpecies);
         edtSearch       = findViewById(R.id.edtSearch);
-        tvGoogleMap     = findViewById(R.id.tvGoogleMap);
+//        tvGoogleMap     = findViewById(R.id.tvGoogleMap); // TODO: get rid of
         btnGoToFish     = findViewById(R.id.btnGoToFish);
         map_container   = findViewById(R.id.map_container);
         tvShowLat = findViewById(R.id.tvShowLat);
         tvShowLong = findViewById(R.id.tvShowLong);
         btnCaughtFish = findViewById(R.id.btnCaughtFish);
-
+        progressBarLoadResults = (ProgressBar) findViewById(R.id.progressBarLoadResults);
 
 
         /* Setup */
         // Display the Name of the fish you are searching locations for
         textViewSpecies.setText("Searching for: " + fishInfo.getFBname());
+        progressBarLoadResults.setVisibility(View.GONE);
 
         // Adds the map Fragment inside the map_container
         addMapFragment();
@@ -161,7 +161,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         final String DEFAULT_STATE     = "MA"; // TODO: Get current State you're in
 
         /* Clean State Input */
-        String state = FishInfoActivity.cleanSpeciesSearch(str);
+        String state = FishListActivity.cleanSpeciesSearch(str);
         if (str.length() <= 1) state = DEFAULT_STATE;
         else {
             state = str.trim();
@@ -304,6 +304,8 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        progressBarLoadResults.setVisibility(View.VISIBLE);
+
         /* Change Map Options */
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
@@ -313,6 +315,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         // TODO: Add search by "commonName" because there are multiple fish in a species
         String urlString = APIBase + genusQuery + GENUS + "&" + speciesQuery + SPECIES + "&" + spatialAccQuery + spatialAcc;   // API call that will get all locations this fish can be caught
         Log.i("Info", "URL: " + urlString);
+
+        /* Reduce Marker Density */
+        ArrayList<LatLng> addedCoordinates = new ArrayList<>();
 
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -360,6 +365,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             }
         });
 
+        final int KILOMETER = 1000;
 
         /* Add Markers of Fish Locations */
         service.execute(new Runnable() {
@@ -381,13 +387,19 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                             /* Add Markers of Fish Locations */
                             for (int i = 0; i < latLngCoordinates.size(); i++) {
                                 LatLng coordinates = latLngCoordinates.get(i);
-                                mMap.addMarker(new MarkerOptions().position(coordinates).title("Marker " + i));
+                                if (!isInRadius(coordinates, addedCoordinates, KILOMETER * 250)) {
+                                    MarkerOptions marker = new MarkerOptions().position(coordinates).title("Marker " + i);
+                                    mMap.addMarker(marker);
+                                    addedCoordinates.add(coordinates);
+                                }
                             }
 
                             /* Navigate to last Marker if one exists */
                             if (latLngCoordinates.size() > 0) {
                                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngCoordinates.get(latLngCoordinates.size() - 1)));
                             }
+
+                            progressBarLoadResults.setVisibility(View.GONE);
 
                         }
                     });
@@ -404,6 +416,13 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
     }
 
+    private boolean isInRadius(LatLng coordinate, List<LatLng> coordinates, int radius) { // Radius in meters
+        for (LatLng coord : coordinates) {
+            if (SphericalUtil.computeDistanceBetween(coordinate, coord) < radius)
+                return true;
+        }
+        return false;
+    }
 
     /*----------------------*/
 }

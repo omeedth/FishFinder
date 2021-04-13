@@ -1,6 +1,8 @@
 package com.example.fishfinder.adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,13 +14,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fishfinder.FishInfoActivity;
 import com.example.fishfinder.R;
+import com.example.fishfinder.SearchForFishActivity;
 import com.example.fishfinder.data.FishInfo;
 
 import java.io.InputStream;
@@ -32,9 +37,11 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
     /* Variables */
     ExecutorService service = Executors.newFixedThreadPool(1);
     ArrayList<FishInfo> fishInfoList = new ArrayList<>();
+    Context activityContext;
 
     public FishInfoAdapter(Context context, int textViewResourceId, ArrayList<FishInfo> objects) {
         super(context, textViewResourceId, objects);
+        activityContext = context;
         fishInfoList = objects;
     }
 
@@ -45,6 +52,10 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+//        if (fishInfoList.get(position) == null) {
+//            return;
+//        }
 
         // If there is already a View then just return it (Didn't Do Anything)
         // We only need to inflate the layout if the layout is not present (it is expensive to keep doing this)
@@ -64,6 +75,39 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
         /* Initialize Components from custom list view XML */
         TextView textView = (TextView) row.findViewById(R.id.textView);
         ImageView imageView = (ImageView) row.findViewById(R.id.imageView);
+        Button buttonShowInfo = (Button) row.findViewById(R.id.buttonShowInfo);
+        Button buttonShowMap = (Button) row.findViewById(R.id.buttonShowMap);
+
+        FishInfo fishInfo = fishInfoList.get(position);
+
+        /* Initialize Listeners */
+        buttonShowInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent goToFishInfoActivity = new Intent(v.getContext(), FishInfoActivity.class);
+                goToFishInfoActivity.putExtra("fishInfo", fishInfo);
+
+                //based on item add info to intent
+                goToFishInfoActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                activityContext.startActivity(goToFishInfoActivity);
+
+            }
+        });
+
+        buttonShowMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent goToSearchForFishActivity = new Intent(v.getContext(), SearchForFishActivity.class);
+                goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
+
+                //based on item add info to intent
+                goToSearchForFishActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                activityContext.startActivity(goToSearchForFishActivity);
+
+            }
+        });
 
         // Retrieve name from the FishInfo object and set that to text of textView
         textView.setText(fishInfoList.get(position).getFBname());
