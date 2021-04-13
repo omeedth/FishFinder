@@ -36,8 +36,9 @@
 
             <TextView
                 android:id="@+id/textViewFBNameText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Common Name:"
                 android:textSize="24sp" />
 
@@ -56,8 +57,9 @@
 
             <TextView
                 android:id="@+id/textViewSpeciesText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Species:"
                 android:textSize="24sp" />
 
@@ -76,8 +78,9 @@
 
             <TextView
                 android:id="@+id/textViewGenusText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Genus:"
                 android:textSize="24sp" />
 
@@ -96,8 +99,9 @@
 
             <TextView
                 android:id="@+id/textViewBodyShapeText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Body Shape:"
                 android:textSize="24sp" />
 
@@ -117,8 +121,9 @@
 
             <TextView
                 android:id="@+id/textViewLengthText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Length:"
                 android:textSize="24sp" />
 
@@ -138,8 +143,9 @@
 
             <TextView
                 android:id="@+id/textViewWeightText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Weight:"
                 android:textSize="24sp" />
 
@@ -158,8 +164,9 @@
 
             <TextView
                 android:id="@+id/textViewDangerousText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Dangerous:"
                 android:textSize="24sp" />
 
@@ -178,8 +185,9 @@
 
             <TextView
                 android:id="@+id/textViewWaterTypeText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Water Type:"
                 android:textSize="24sp" />
 
@@ -198,16 +206,17 @@
 
             <TextView
                 android:id="@+id/textViewCommentsText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Comments:"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                android:layout_weight="1" />
 
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/textViewCommentsInfo"

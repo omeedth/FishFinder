@@ -99,7 +99,8 @@ public class FishListActivity extends AppCompatActivity {
             // If fish Name is entered then search by Fish Name
             if (fishNameEntered.length() > 0) {
 
-                int endPoint = 20000;   // How many records will we try to search for (Max Value means going through all records)
+//                RestAPIUtil.get(FishBaseAPIBase + FishBaseAPISpecies);
+                int endPoint = 34571;   // How many records will we try to search for (Max Value means going through all records) // HARDCODED TO MAX RESULTS RIGHT NOW
                 int offset = 0;         // Where we start searching from
                 int batchSize = 1000;    // How many records we search per query
 
