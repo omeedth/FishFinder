@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.fishfinder">
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -11,9 +10,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-    <uses-feature android:name="android.hardware.camera2" android:required="true" />
-
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera2"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -22,7 +24,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FishFinder">
-
+        <activity android:name=".FishInfoActivity"></activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -37,8 +39,8 @@
 
         <activity
             android:name=".FishLocationActivity"
-            android:label="@string/title_activity_fish_location"></activity>
-        <activity android:name=".FishInfoActivity" />
+            android:label="@string/title_activity_fish_location" />
+        <activity android:name=".FishListActivity" />
         <activity android:name=".SearchForFishActivity" />
         <activity android:name=".MainPageActivity" />
         <activity android:name=".RegisterActivity" />
@@ -46,8 +48,6 @@
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".CaughtFishActivity" />
         <activity android:name=".ConfirmSavePublishActivity" />
-
-
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

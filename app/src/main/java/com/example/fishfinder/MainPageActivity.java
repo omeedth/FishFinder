@@ -1,7 +1,6 @@
 package com.example.fishfinder;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -54,7 +53,7 @@ public class MainPageActivity extends AppCompatActivity {
 //                startActivity(goToSearchForFishActivity);
 
                 /* Go to FishInfoPage */
-                Intent goToFishInfoActivity = new Intent(v.getContext(), FishInfoActivity.class);
+                Intent goToFishInfoActivity = new Intent(v.getContext(), FishListActivity.class);
                 startActivity(goToFishInfoActivity);
             }
         });
