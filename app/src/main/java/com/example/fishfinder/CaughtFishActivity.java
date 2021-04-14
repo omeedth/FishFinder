@@ -38,20 +38,20 @@ import java.io.ByteArrayOutputStream;
 
 public class CaughtFishActivity extends AppCompatActivity {
 
-    private EditText edtSaveTitle;
-    private EditText edtSaveFishName;
+    private EditText    edtSaveTitle;
+    private EditText    edtSaveFishName;
     private ImageButton imgButtonTakePicture;
-    private Button btnSubmitSave;
-    private EditText edtSaveLatitude;
-    private EditText edtSaveLongitude;
+    private Button      btnSubmitSave;
+    private EditText    edtSaveLatitude;
+    private EditText    edtSaveLongitude;
 
-    private EditText edtSaveWeight;
-    private EditText edtSaveLength;
-    private EditText edtSaveSpecies;
-    private EditText edtSaveGenus;
-    private EditText edtSaveBait;
-    private EditText edtSaveBodyShape;
-    private EditText edtSaveUserComments;
+    private EditText    edtSaveWeight;
+    private EditText    edtSaveLength;
+    private EditText    edtSaveSpecies;
+    private EditText    edtSaveGenus;
+    private EditText    edtSaveBait;
+    private EditText    edtSaveBodyShape;
+    private EditText    edtSaveUserComments;
 
 
 
@@ -82,21 +82,21 @@ public class CaughtFishActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_caught_fish);
 
-        edtSaveTitle = (EditText) findViewById(R.id.edtSaveTitle);
-        edtSaveFishName = (EditText) findViewById(R.id.edtSaveFishName);
+        edtSaveTitle         = (EditText) findViewById(R.id.edtSaveTitle);
+        edtSaveFishName      = (EditText) findViewById(R.id.edtSaveFishName);
         imgButtonTakePicture = (ImageButton) findViewById(R.id.imgButtonTakePicture);
-        btnSubmitSave = (Button) findViewById(R.id.btnSubmitSave);
-        edtSaveWeight = (EditText) findViewById(R.id.edtSaveWeight);
-        edtSaveLength = (EditText) findViewById(R.id.edtSaveLength);
-        edtSaveSpecies = (EditText) findViewById(R.id.edtSaveSpecies);
-        edtSaveGenus = (EditText) findViewById(R.id.edtSaveGenus);
-        edtSaveBait = (EditText) findViewById(R.id.edtSaveBait);
-        edtSaveBodyShape = (EditText) findViewById(R.id.edtSaveBodyShape);
-        edtSaveUserComments = (EditText) findViewById(R.id.edtSaveUserComments);
+        btnSubmitSave        = (Button) findViewById(R.id.btnSubmitSave);
+        edtSaveWeight        = (EditText) findViewById(R.id.edtSaveWeight);
+        edtSaveLength        = (EditText) findViewById(R.id.edtSaveLength);
+        edtSaveSpecies       = (EditText) findViewById(R.id.edtSaveSpecies);
+        edtSaveGenus         = (EditText) findViewById(R.id.edtSaveGenus);
+        edtSaveBait          = (EditText) findViewById(R.id.edtSaveBait);
+        edtSaveBodyShape     = (EditText) findViewById(R.id.edtSaveBodyShape);
+        edtSaveUserComments  = (EditText) findViewById(R.id.edtSaveUserComments);
 
 
 
-        edtSaveLatitude = (EditText) findViewById(R.id.edtSaveLatitude);
+        edtSaveLatitude  = (EditText) findViewById(R.id.edtSaveLatitude);
         edtSaveLongitude = (EditText) findViewById(R.id.edtSaveLongitude);
 
 

@@ -40,6 +40,8 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     /* Variables */
     private final String DEFAULT_SPECIES = "cyanellus"; // TODO: Change the default
     private final String DEFAULT_GENUS = "Lepomis";
+    private final int KILOMETER = 1000;
+    private ArrayList<LatLng> addedCoordinates;
     private String SPECIES;
     private String GENUS;
     private GoogleMap mMap;
@@ -318,7 +320,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         Log.i("Info", "URL: " + urlString);
 
         /* Reduce Marker Density */
-        ArrayList<LatLng> addedCoordinates = new ArrayList<>();
+        addedCoordinates = new ArrayList<>();
 
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -366,7 +368,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             }
         });
 
-        final int KILOMETER = 1000;
+
 
         /* Add Markers of Fish Locations */
         service.execute(new Runnable() {
@@ -387,12 +389,8 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
                             /* Add Markers of Fish Locations */
                             for (int i = 0; i < latLngCoordinates.size(); i++) {
-                                LatLng coordinates = latLngCoordinates.get(i);
-                                if (!isInRadius(coordinates, addedCoordinates, KILOMETER * 250)) {
-                                    MarkerOptions marker = new MarkerOptions().position(coordinates).title("Marker " + i);
-                                    mMap.addMarker(marker);
-                                    addedCoordinates.add(coordinates);
-                                }
+                                addMarker(latLngCoordinates.get(i));
+
                             }
 
                             /* Navigate to last Marker if one exists */
@@ -415,6 +413,14 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
 
 
+    }
+
+    private void addMarker(LatLng coordinates){
+        if (!isInRadius(coordinates, addedCoordinates, KILOMETER * 250)) {
+            MarkerOptions marker = new MarkerOptions().position(coordinates).title("Marker " + addedCoordinates.size());
+            mMap.addMarker(marker);
+            addedCoordinates.add(coordinates);
+        }
     }
 
     private boolean isInRadius(LatLng coordinate, List<LatLng> coordinates, int radius) { // Radius in meters
