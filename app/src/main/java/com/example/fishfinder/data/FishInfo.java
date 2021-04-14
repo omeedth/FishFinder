@@ -1,5 +1,7 @@
 package com.example.fishfinder.data;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 public class FishInfo implements Serializable {
@@ -18,6 +20,8 @@ public class FishInfo implements Serializable {
     private boolean Fresh;
     private boolean Saltwater;
 
+    private byte[] imageBytes;
+
     /* Constructor - TODO: Possibly make default values null */
     public FishInfo() {
         common_name = null;
@@ -30,6 +34,7 @@ public class FishInfo implements Serializable {
         image = null;
         Dangerous = null;
         Comments = null;
+        imageBytes = null;
     }
 
     /* Accessor Methods */
@@ -82,6 +87,12 @@ public class FishInfo implements Serializable {
         return Saltwater;
     }
 
+    public byte[] getImageBytes() {
+        return imageBytes;
+    }
+
+
+
     /* Mutator Methods */
 
     public void setSpecies(String species) {
@@ -130,6 +141,10 @@ public class FishInfo implements Serializable {
 
     public void setSaltwater(boolean saltwater) {
         Saltwater = saltwater;
+    }
+
+    public void setImageBytes(byte[] imageBytes) {
+        this.imageBytes = imageBytes;
     }
 
     /* Logic Methods */

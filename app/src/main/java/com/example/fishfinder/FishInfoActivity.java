@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
@@ -13,8 +15,12 @@ import android.widget.TextView;
 
 import com.example.fishfinder.adapters.FishInfoAdapter;
 import com.example.fishfinder.data.FishInfo;
+import com.example.fishfinder.util.RestAPIUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FishInfoActivity extends AppCompatActivity {
 
@@ -67,7 +73,44 @@ public class FishInfoActivity extends AppCompatActivity {
 
         // Download Fish Image
         String img_url = fishInfo.getImage();
-        new DownloadImageTask(imageViewFish).execute(img_url);
+//        new DownloadImageTask(imageViewFish).execute(img_url);
+
+        if (fishInfo.getImageBytes() != null) {
+//            Log.i("Info", "Image Already Grabbed!");  // DEBUGGING
+            Bitmap fishImageBM = BitmapFactory.decodeByteArray(fishInfo.getImageBytes(), 0, fishInfo.getImageBytes().length);
+            imageViewFish.setImageBitmap(fishImageBM);
+        } else {
+            ExecutorService service = Executors.newFixedThreadPool(1);
+            service.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Bitmap fishImageBM = RestAPIUtil.getImage(img_url);
+
+                    /* Compressing image to bytes (if we get an image) */
+                    if (fishImageBM != null) {
+
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        fishImageBM.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] imageBytes = stream.toByteArray();
+
+                        // Adding the image bytes to FishInfo
+                        fishInfo.setImageBytes(imageBytes);
+
+                    }
+
+                    // This will post a command to the main UI Thread
+                    // This is necessary so that the code knows the variables for this class
+                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageViewFish.setImageBitmap(fishImageBM);
+                        }
+                    });
+
+                }
+            });
+        }
 
         // TODO: Make layout look better
         // TODO: Fix Comments overflow problem
@@ -83,37 +126,37 @@ public class FishInfoActivity extends AppCompatActivity {
 
     }
 
-    // TODO: stop using depreciated AsyncTask
-    // TODO: Consolidate! Reuse this code
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-
-            // Check if URL is valid
-            if (!URLUtil.isValidUrl(urldisplay)) {
-//                Log.e("Error", "Invalid URL: " + urldisplay);
-                return null;
-            }
-
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in); // ERROR: Failed to create image decoder with message 'unimplemented', from Incomplete image data
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage() + ", URL: " + urldisplay);
-//                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
-    }
+//    // TODO: stop using depreciated AsyncTask
+//    // TODO: Consolidate! Reuse this code
+//    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+//        ImageView bmImage;
+//
+//        public DownloadImageTask(ImageView bmImage) {
+//            this.bmImage = bmImage;
+//        }
+//
+//        protected Bitmap doInBackground(String... urls) {
+//            String urldisplay = urls[0];
+//            Bitmap mIcon11 = null;
+//
+//            // Check if URL is valid
+//            if (!URLUtil.isValidUrl(urldisplay)) {
+////                Log.e("Error", "Invalid URL: " + urldisplay);
+//                return null;
+//            }
+//
+//            try {
+//                InputStream in = new java.net.URL(urldisplay).openStream();
+//                mIcon11 = BitmapFactory.decodeStream(in); // ERROR: Failed to create image decoder with message 'unimplemented', from Incomplete image data
+//            } catch (Exception e) {
+//                Log.e("Error", e.getMessage() + ", URL: " + urldisplay);
+////                e.printStackTrace();
+//            }
+//            return mIcon11;
+//        }
+//
+//        protected void onPostExecute(Bitmap result) {
+//            bmImage.setImageBitmap(result);
+//        }
+//    }
 }

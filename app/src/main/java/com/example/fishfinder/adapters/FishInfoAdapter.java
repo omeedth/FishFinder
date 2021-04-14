@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,24 +27,47 @@ import com.example.fishfinder.FishInfoActivity;
 import com.example.fishfinder.R;
 import com.example.fishfinder.SearchForFishActivity;
 import com.example.fishfinder.data.FishInfo;
+import com.example.fishfinder.util.RestAPIUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 // TODO: Consider changing to RecyclerView for performance improvement
 public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
 
     /* Variables */
-    ExecutorService service = Executors.newFixedThreadPool(1);
+//    ExecutorService service = Executors.newFixedThreadPool(1);
     ArrayList<FishInfo> fishInfoList = new ArrayList<>();
     Context activityContext;
+    ExecutorService parentActivityService;
 
-    public FishInfoAdapter(Context context, int textViewResourceId, ArrayList<FishInfo> objects) {
+    private Runnable callback;  // A call back function from the activity to run (UNUSED)
+
+    public FishInfoAdapter(Context context, int textViewResourceId, ArrayList<FishInfo> objects, ExecutorService parentActivityService, Runnable callback) {
         super(context, textViewResourceId, objects);
         activityContext = context;
         fishInfoList = objects;
+        this.parentActivityService = parentActivityService;
+        this.callback = callback;
+    }
+
+    public FishInfoAdapter(Context context, int textViewResourceId, ArrayList<FishInfo> objects, Runnable callback) {
+        this(context, textViewResourceId, objects, null, callback);
+    }
+
+    public FishInfoAdapter(Context context, int textViewResourceId, ArrayList<FishInfo> objects, ExecutorService parentActivityService) {
+        this(context, textViewResourceId, objects, parentActivityService, null);
+    }
+
+    public FishInfoAdapter(Context context, int textViewResourceId, ArrayList<FishInfo> objects) {
+        this(context, textViewResourceId, objects, null, null);
     }
 
     @Override
@@ -50,6 +75,9 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
         return super.getCount();
     }
 
+    // https://stackoverflow.com/questions/6081497/listview-shows-wrong-images
+    // BUG - wrong images are shown sometimes, or it takes forever for it to load the correct image
+    // Sometimes you need to scroll out and back in to get the right image
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -80,16 +108,27 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
 
         FishInfo fishInfo = fishInfoList.get(position);
 
+//        // Have empty imageView Initially
+//        imageView.setImageBitmap(null);
+
+        // Retrieve name from the FishInfo object and set that to text of textView
+        textView.setText(fishInfoList.get(position).getFBname());
+
         /* Initialize Listeners */
         buttonShowInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                /* If the parent activity has other processes running on the other thread, terminate all of them */
+                if (parentActivityService != null) {
+                    parentActivityService.shutdownNow();
+                }
+
                 Intent goToFishInfoActivity = new Intent(v.getContext(), FishInfoActivity.class);
                 goToFishInfoActivity.putExtra("fishInfo", fishInfo);
 
-                //based on item add info to intent
-                goToFishInfoActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                // based on item add info to intent
+                goToFishInfoActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);   // This flag is required to be added to activity for us to navigate there from this class
                 activityContext.startActivity(goToFishInfoActivity);
 
             }
@@ -99,64 +138,145 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
             @Override
             public void onClick(View v) {
 
+                /* If the parent activity has other processes running on the other thread, terminate all of them */
+                if (parentActivityService != null) {
+                    parentActivityService.shutdownNow();
+                }
+
                 Intent goToSearchForFishActivity = new Intent(v.getContext(), SearchForFishActivity.class);
                 goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
 
                 //based on item add info to intent
-                goToSearchForFishActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                goToSearchForFishActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  // This flag is required to be added to activity for us to navigate there from this class
                 activityContext.startActivity(goToSearchForFishActivity);
 
             }
         });
 
-        // Retrieve name from the FishInfo object and set that to text of textView
-        textView.setText(fishInfoList.get(position).getFBname());
+//        // Download Image Task - (BUG: when scrolling the images get out of order during re-render process)
+//        if(hasImage(imageView)) {
+//            // Image already downloaded... Do Nothing
+//            Log.i("Debug","Position: " + position + ", Image Already Exists!");
+//        } else {
+//            // Image not included in the ImageView... Download the Image
+//            String img_url = fishInfoList.get(position).getImage();
+////            new DownloadImageTask(imageView).execute(img_url);
+//
+//            ExecutorService service = Executors.newFixedThreadPool(1);
+//            service.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Bitmap fishImageBM = RestAPIUtil.getImage(img_url);
+//
+//                    /* Compressing image to bytes (if we get an image) */
+//                    if (fishImageBM != null) {
+//
+//                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                        fishImageBM.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//                        byte[] imageBytes = stream.toByteArray();
+//
+//                        // Adding the image bytes to FishInfo
+//                        fishInfo.setImageBytes(imageBytes);
+//
+//                    }
+//
+//                    // This will post a command to the main UI Thread
+//                    // This is necessary so that the code knows the variables for this class
+//                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+//                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            imageView.setImageBitmap(fishImageBM);
+//                        }
+//                    });
+//
+//                }
+//            });
+//
+//        }
 
-        // Download Image Task - TODO: Optimize this by not re-downloading the image if we already have the image downloaded
-        if(hasImage(imageView)) {
-            // Image already downloaded... Do Nothing
-            Log.i("Debug","Position: " + position + ", Image Already Exists!");
+        // Download Image Task
+        if (false) { // fishInfo.getImageBytes() != null
+            Bitmap fishImageBM = BitmapFactory.decodeByteArray(fishInfo.getImageBytes(), 0, fishInfo.getImageBytes().length);
+            imageView.setImageBitmap(fishImageBM);
         } else {
+
             // Image not included in the ImageView... Download the Image
             String img_url = fishInfoList.get(position).getImage();
-            new DownloadImageTask(imageView).execute(img_url);
+
+            ExecutorService service = Executors.newFixedThreadPool(1);
+            service.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Bitmap fishImageBM = RestAPIUtil.getImage(img_url);
+
+                    /* Compressing image to bytes (if we get an image) */
+                    if (fishImageBM != null) {
+
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        fishImageBM.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] imageBytes = stream.toByteArray();
+
+                        // Adding the image bytes to FishInfo
+                        fishInfo.setImageBytes(imageBytes);
+
+                    }
+
+                    // This will post a command to the main UI Thread
+                    // This is necessary so that the code knows the variables for this class
+                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageBitmap(fishImageBM);
+                        }
+                    });
+
+                }
+            });
+
         }
 
         return row;
 
     }
 
-    // TODO: stop using depreciated AsyncTask
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
+//    // TODO: stop using depreciated AsyncTask
+//    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+//        ImageView bmImage;
+//
+//        public DownloadImageTask(ImageView bmImage) {
+//            this.bmImage = bmImage;
+//        }
+//
+//        protected Bitmap doInBackground(String... urls) {
+//            String urldisplay = urls[0];
+//            Bitmap mIcon11 = null;
+//
+//            // Check if URL is valid
+//            if (!URLUtil.isValidUrl(urldisplay)) {
+////                Log.e("Error", "Invalid URL: " + urldisplay);
+//                return null;
+//            }
+//
+//            try {
+//                InputStream in = new java.net.URL(urldisplay).openStream();
+//                mIcon11 = BitmapFactory.decodeStream(in); // ERROR: Failed to create image decoder with message 'unimplemented', from Incomplete image data
+//            } catch (Exception e) {
+//                Log.e("Error", e.getMessage() + ", URL: " + urldisplay);
+////                e.printStackTrace();
+//            }
+//            return mIcon11;
+//        }
+//
+//        protected void onPostExecute(Bitmap result) {
+//            bmImage.setImageBitmap(result);
+//        }
+//    }
 
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
 
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-
-            // Check if URL is valid
-            if (!URLUtil.isValidUrl(urldisplay)) {
-//                Log.e("Error", "Invalid URL: " + urldisplay);
-                return null;
-            }
-
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in); // ERROR: Failed to create image decoder with message 'unimplemented', from Incomplete image data
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage() + ", URL: " + urldisplay);
-//                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
+    public void setParentActivityService(ExecutorService parentActivityService) {
+        this.parentActivityService = parentActivityService;
     }
 
     private boolean hasImage(@NonNull ImageView view) {

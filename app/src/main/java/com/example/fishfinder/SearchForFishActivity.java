@@ -2,6 +2,7 @@ package com.example.fishfinder;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -44,6 +45,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     private String GENUS;
     private GoogleMap mMap;
     private FishInfo fishInfo;
+    private Context ctx;
 
     //Components
     private TextView        textViewSpecies;
@@ -102,6 +104,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         } else {
 //            fishInfo = (FishInfo) savedInstanceState.getSerializable("fishInfo");
         }
+
+        /* Initialize Variables */
+        ctx = this.getBaseContext();
 
         /* Initialize Components */
         textViewSpecies = findViewById(R.id.textViewSpecies);
@@ -406,8 +411,21 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                     });
 
                 } catch (Exception e){
-                    e.printStackTrace();
-                    System.out.println(e.getLocalizedMessage());
+                    Log.e("Error","Error loading the locations of the fish!");
+
+                    // This will post a command to the main UI Thread
+                    // This is necessary so that the code knows the variables for this class
+                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBarLoadResults.setVisibility(View.GONE);
+                            Toast.makeText(ctx, "Error Loading Markers!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+//                    e.printStackTrace();
+//                    System.out.println(e.getLocalizedMessage());
                 }
             }
         });
