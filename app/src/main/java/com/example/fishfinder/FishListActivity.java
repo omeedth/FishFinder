@@ -63,7 +63,7 @@ public class FishListActivity extends AppCompatActivity {
     private ListView listViewFishInfo;
 
     // Only purpose is to run a function on a different thread, avoids thread locking on the UI
-    ExecutorService service = Executors.newFixedThreadPool(2);
+    ExecutorService service = Executors.newFixedThreadPool(1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +74,7 @@ public class FishListActivity extends AppCompatActivity {
 
         /* Initialize Variables */
         ctx = this.getBaseContext();
-        fishInfoAdapter = new FishInfoAdapter(ctx, R.layout.list_view_fish_info, new ArrayList<FishInfo>(), service);
+        fishInfoAdapter = new FishInfoAdapter(ctx, R.layout.list_view_fish_info, new ArrayList<FishInfo>()); // , service
 
         /* Initializing Components */
         listViewFishInfo = (ListView) findViewById(R.id.listViewFishInfo);
@@ -126,7 +126,7 @@ public class FishListActivity extends AppCompatActivity {
 
                 /* Reset ExecutorService */
                 service.shutdownNow();
-                service = Executors.newFixedThreadPool(2);
+                service = Executors.newFixedThreadPool(1);
                 fishInfoAdapter.setParentActivityService(service);
 
                 /* Clear List Adapter */
@@ -185,7 +185,7 @@ public class FishListActivity extends AppCompatActivity {
         // Restart the ExecutorService if it is terminated
         if(service.isShutdown()) {
             Log.i("Info","Service is shutdown... Reinitializing Service!");
-            service = Executors.newFixedThreadPool(2);
+            service = Executors.newFixedThreadPool(1);
             fishInfoAdapter.setParentActivityService(service);
         }
 

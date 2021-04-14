@@ -189,8 +189,10 @@ public class CaughtFishActivity extends AppCompatActivity {
                 //a database using GeneralTest as the object to inject to firebase
                 //just adding all the user submitted values to this class
                 GeneralTest toAdd = new GeneralTest();
+                // TODO: pass value from EditText instead of the variable passed in
                 toAdd.setLatitude(latitudeVal);
                 toAdd.setLongitude(longitudeVal);
+
                 toAdd.setTitle(edtSaveTitle.getText().toString());
                 toAdd.setUserId(userId);
                 toAdd.setEmail(userEmail);

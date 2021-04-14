@@ -1,5 +1,6 @@
 package com.example.fishfinder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -22,9 +23,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 
 import org.json.JSONArray;
@@ -46,6 +55,17 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     private GoogleMap mMap;
     private FishInfo fishInfo;
     private Context ctx;
+
+    // Set the colors that we will be using for API and Community locations
+
+    // Settings for the user
+    private boolean showUSGSLocations = true;
+    private boolean showCommunitySaves = true;
+
+    // FireBase - Database Info
+    FirebaseDatabase firebase;
+    FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
 
     //Components
     private TextView        textViewSpecies;
@@ -88,25 +108,27 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_for_fish);
 
+        /* Initialize Variables */
+        ctx = this.getBaseContext();
+
+        firebase = FirebaseDatabase.getInstance(); //get the root node point of the database, this is so we can get the references based on the root node to get the desired data references
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
+
         /* Get Bundle Info */
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
                 SPECIES = DEFAULT_SPECIES;
                 GENUS = DEFAULT_GENUS;
+                fishInfo = new FishInfo();
+                Toast.makeText(ctx, "Error No Fish Info Found!", Toast.LENGTH_SHORT).show();
             } else {
-//                Log.i("Info", "Found Species <" + extras.getString("species") + "> in Bundle\'s Extras!");
-//                SPECIES = extras.getString("species");
                 fishInfo = (FishInfo) extras.getSerializable("fishInfo");
                 SPECIES = fishInfo.getSpecies();
                 GENUS = fishInfo.getGenus();
             }
-        } else {
-//            fishInfo = (FishInfo) savedInstanceState.getSerializable("fishInfo");
         }
-
-        /* Initialize Variables */
-        ctx = this.getBaseContext();
 
         /* Initialize Components */
         textViewSpecies = findViewById(R.id.textViewSpecies);
@@ -133,10 +155,12 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             @Override
             public void onClick(View v) {
 
-                // Call NAS API (Finds Locations of Fish)
-                String name = edtSearch.getText().toString();
-                getCordinates(name); //This is for calling the markers on the map for each state after the intiial googlemaps initialization.
-
+                if (showUSGSLocations) { // TODO: Move this so that it just changes the visibility of the markers
+                    // Call NAS API (Finds Locations of Fish)
+                    Log.i("Info", "Getting coordinates from USGS API..."); // DEBUGGING
+                    String name = edtSearch.getText().toString();
+                    getCordinates(name); //This is for calling the markers on the map for each state after the initial google maps initialization.
+                }
 
                 // Change Intent to Google Map Intent
 //                Intent goToFishLocationActivity = new Intent(v.getContext(), FishLocationActivity.class);
@@ -320,16 +344,89 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         String spatialAcc = ACCURATE_SPATIAL_ACCURACY; // TODO: Decide which spatialAcc method to use (filter/settings)
         // TODO: Add search by "commonName" because there are multiple fish in a species
         String urlString = APIBase + genusQuery + GENUS + "&" + speciesQuery + SPECIES + "&" + spatialAccQuery + spatialAcc;   // API call that will get all locations this fish can be caught
-        Log.i("Info", "URL: " + urlString);
+        Log.i("Info", "URL: " + urlString); // DEBUGGING
+        Log.i("Info", "<FishInfo> Species: " + fishInfo.getSpecies() + ", Genus: " + fishInfo.getGenus()); // DEBUGGING
 
         /* Reduce Marker Density */
         ArrayList<LatLng> addedCoordinates = new ArrayList<>();
 
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                // Grab markers from firebase
+                if (showCommunitySaves) {
+                    // Show the locations from the community
+                    Log.i("Info", "Getting coordinates from Firebase Community..."); // DEBUGGING
+                    DatabaseReference communitySavesReference = firebase.getReference().child("CommunitySaves");
+                    communitySavesReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                // Data is each child element in the "CommunitySaves" Database Reference now
+                                String genus = null;
+                                String species = null;
+
+                                try {
+                                    genus = data.child("genus").getValue(String.class);
+                                    species = data.child("species").getValue(String.class);
+                                } catch (Exception e) {
+                                    Log.e("Error", "Could not get genus or species");
+                                }
+
+                                Log.i("Info", "<COMMUNITY> Species: " + species + ", Genus: " + genus); // DEBUGGING
+
+                                // Check if the fish we are on matches the fish posted in the database
+                                if (fishInfo.getGenus().equals(genus) && fishInfo.getSpecies().equals(species)) {
+
+                                    Log.i("Info", "Fish Match Found On Community!"); // DEBUGGING
+
+                                    LatLng communityCoords = null;
+                                    double latitude;
+                                    double longitude;
+
+                                    try {
+                                        latitude = Double.parseDouble(data.child("latitude").getValue(String.class));
+                                        longitude = Double.parseDouble(data.child("longitude").getValue(String.class));
+                                        communityCoords = new LatLng(latitude, longitude);
+                                        Log.i("Info", "Location: " + communityCoords); // DEBUGGING
+
+//                                        MarkerOptions communityMarker = new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).alpha(1f).position(coordinates).title("Community Catch!");
+//                                        MarkerOptions communityMarker = new MarkerOptions().position(communityCoords).title("Community Catch!");
+                                        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)));
+
+                                        // WORKED
+//                                        LatLng test = new LatLng(20,20);
+//                                        mMap.addMarker(new MarkerOptions().position(test));
+
+                                        Log.i("Info", "Added Community Marker!"); // DEBUGGING
+
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(communityCoords)); // DEBUGGING - Move to the community caught fish
+
+                                    } catch(Exception e) {
+                                        Log.e("Error", "Could not get Latitude or Longitude! Latitude: " + data.child("latitude").getValue(String.class) + ", Longitude: " + data.child("longitude").getValue(String.class));
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+            }
+        });
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
 
+                // TODO: Somehow the latitude and longitude appear to be switched
                 String lat = String.valueOf(latLng.latitude);
                 String lng = String.valueOf(latLng.longitude);
 
@@ -350,6 +447,8 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+
+                // TODO: Somehow the latitude and longitude appear to be switched
                 String lat = String.valueOf(marker.getPosition().latitude);
                 String lng = String.valueOf(marker.getPosition().longitude);
                 Toast.makeText(SearchForFishActivity.this, "Location:" + lat + lng, Toast.LENGTH_SHORT).show();

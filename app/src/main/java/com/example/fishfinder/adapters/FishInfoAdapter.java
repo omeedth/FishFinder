@@ -31,7 +31,9 @@ import com.example.fishfinder.util.RestAPIUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -45,6 +47,7 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
     /* Variables */
 //    ExecutorService service = Executors.newFixedThreadPool(1);
     ArrayList<FishInfo> fishInfoList = new ArrayList<>();
+    ArrayList<Bitmap> fishImageList = new ArrayList<>();
     Context activityContext;
     ExecutorService parentActivityService;
 
@@ -108,8 +111,8 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
 
         FishInfo fishInfo = fishInfoList.get(position);
 
-//        // Have empty imageView Initially
-//        imageView.setImageBitmap(null);
+        // Have empty imageView Initially
+        imageView.setImageResource(android.R.color.transparent);
 
         // Retrieve name from the FishInfo object and set that to text of textView
         textView.setText(fishInfoList.get(position).getFBname());
@@ -196,13 +199,15 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
 //        }
 
         // Download Image Task
-        if (false) { // fishInfo.getImageBytes() != null
+        if (fishInfo.getImageBytes() != null) {
             Bitmap fishImageBM = BitmapFactory.decodeByteArray(fishInfo.getImageBytes(), 0, fishInfo.getImageBytes().length);
             imageView.setImageBitmap(fishImageBM);
         } else {
 
             // Image not included in the ImageView... Download the Image
             String img_url = fishInfoList.get(position).getImage();
+
+            Log.i("Info", "Grabbing Fish Image for Position: " + position);
 
             ExecutorService service = Executors.newFixedThreadPool(1);
             service.execute(new Runnable() {
@@ -236,6 +241,40 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
             });
 
         }
+
+//        // Download Image Task - Saved Bitmaps
+//        if (fishImageList.size() > position && fishImageList.get(position) != null) {
+//            Bitmap fishImageBM = fishImageList.get(position);
+//            imageView.setImageBitmap(fishImageBM);
+//        } else {
+//
+//            Log.i("Info", "Grabbing Fish Image for Position: " + position);
+//
+//            // Image not included in the ImageView... Download the Image
+//            String img_url = fishInfoList.get(position).getImage();
+//            fishImageList.add(null);
+//
+//            ExecutorService service = Executors.newFixedThreadPool(1);
+//            service.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Bitmap fishImageBM = RestAPIUtil.getImage(img_url);
+//                    fishImageList.add(position, fishImageBM);
+//
+//                    // This will post a command to the main UI Thread
+//                    // This is necessary so that the code knows the variables for this class
+//                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+//                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            imageView.setImageBitmap(fishImageBM);
+//                        }
+//                    });
+//
+//                }
+//            });
+//
+//        }
 
         return row;
 
