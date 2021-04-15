@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D1E6F6"
+    android:background="@drawable/fishbackgroud"
     tools:context=".SearchForFishActivity">
 
     <EditText
@@ -28,8 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="40dp"
-        android:text="@string/textview"
         android:orientation="vertical"
+        android:text="@string/textview"
         app:layout_constraintBottom_toTopOf="@+id/btnGoToFish"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.593"
@@ -46,6 +46,7 @@
                 style="?android:attr/progressBarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="283dp"
+                android:progressBackgroundTint="#03A9F4"
                 android:translationZ="90dp" />
         </FrameLayout>
 

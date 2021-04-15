@@ -410,11 +410,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             }
         });
 
-
-
-
     }
-
     private void addMarker(LatLng coordinates){
         if (!isInRadius(coordinates, addedCoordinates, KILOMETER * 250)) {
             MarkerOptions marker = new MarkerOptions().position(coordinates).title("Marker " + addedCoordinates.size());
