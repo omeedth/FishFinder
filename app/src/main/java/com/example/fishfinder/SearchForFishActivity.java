@@ -1,7 +1,9 @@
 package com.example.fishfinder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,9 +23,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 
 import org.json.JSONArray;
@@ -44,11 +54,23 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     private String GENUS;
     private GoogleMap mMap;
     private FishInfo fishInfo;
+    private Context ctx;
+
+    // Set the colors that we will be using for API and Community locations
+
+    // Settings for the user
+    private boolean showUSGSLocations = true;
+    private boolean showCommunitySaves = true;
+
+    // FireBase - Database Info
+    FirebaseDatabase firebase;
+    FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
 
     //Components
     private TextView        textViewSpecies;
     private EditText        edtSearch;
-//    private TextView        tvGoogleMap; // TODO: Get rid of later
+    //    private TextView        tvGoogleMap; // TODO: Get rid of later
     private Button          btnGoToFish;
     private FrameLayout     map_container;
 
@@ -86,27 +108,31 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_for_fish);
 
+        /* Initialize Variables */
+        ctx = this.getBaseContext();
+
+        firebase = FirebaseDatabase.getInstance(); //get the root node point of the database, this is so we can get the references based on the root node to get the desired data references
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
+
         /* Get Bundle Info */
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
                 SPECIES = DEFAULT_SPECIES;
                 GENUS = DEFAULT_GENUS;
+                fishInfo = new FishInfo();
+                Toast.makeText(ctx, "Error No Fish Info Found!", Toast.LENGTH_SHORT).show();
             } else {
-//                Log.i("Info", "Found Species <" + extras.getString("species") + "> in Bundle\'s Extras!");
-//                SPECIES = extras.getString("species");
                 fishInfo = (FishInfo) extras.getSerializable("fishInfo");
                 SPECIES = fishInfo.getSpecies();
                 GENUS = fishInfo.getGenus();
             }
-        } else {
-//            fishInfo = (FishInfo) savedInstanceState.getSerializable("fishInfo");
         }
 
         /* Initialize Components */
         textViewSpecies = findViewById(R.id.textViewSpecies);
         edtSearch       = findViewById(R.id.edtSearch);
-//        tvGoogleMap     = findViewById(R.id.tvGoogleMap); // TODO: get rid of
         btnGoToFish     = findViewById(R.id.btnGoToFish);
         map_container   = findViewById(R.id.map_container);
         tvShowLat = findViewById(R.id.tvShowLat);
@@ -128,14 +154,12 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             @Override
             public void onClick(View v) {
 
-                // Call NAS API (Finds Locations of Fish)
-                String name = edtSearch.getText().toString();
-                getCordinates(name); //This is for calling the markers on the map for each state after the intiial googlemaps initialization.
-
-
-                // Change Intent to Google Map Intent
-//                Intent goToFishLocationActivity = new Intent(v.getContext(), FishLocationActivity.class);
-//                startActivity(goToFishLocationActivity);
+                if (showUSGSLocations) { // TODO: Move this so that it just changes the visibility of the markers
+                    // Call NAS API (Finds Locations of Fish)
+                    Log.i("Info", "Getting coordinates from USGS API..."); // DEBUGGING
+                    String name = edtSearch.getText().toString();
+                    getCordinates(name); //This is for calling the markers on the map for each state after the initial google maps initialization.
+                }
 
             }
         });
@@ -144,6 +168,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             @Override
             public void onClick(View v) {
                 Intent goToCaughtFishActivity = new Intent(v.getContext(), CaughtFishActivity.class);
+                goToCaughtFishActivity.putExtra("fishInfo", fishInfo);
                 goToCaughtFishActivity.putExtra("latitude", LatitudeClicked);
                 goToCaughtFishActivity.putExtra("longitude", LongitudeClicked);
                 //TODO other fill ins like species name and etc... to putExtra
@@ -153,6 +178,14 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         });
 
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        /* Stop Asynchronous Thread */
+        service.shutdownNow();
+
+        super.onBackPressed();
     }
 
     private void getCordinates(String str) {
@@ -170,27 +203,6 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                 state = state.substring(0, 2).toUpperCase();
             }
         }
-
-//        if (pieces.length > 0) {
-//            String genus_ = pieces[0].trim();
-//            if (genus_.length() > 0){
-//                genus = pieces[0].trim();
-//            }
-//        }
-//
-//        if (pieces.length > 1) {
-//            String species_ = pieces[1].trim();
-//            if (species_.length() > 0){
-//                species = pieces[1].trim();
-//            }
-//        }
-//
-//        if (pieces.length > 2) {
-//            String state_ = pieces[2].trim();
-//            if (state_.length() >= 2){
-//                state = state_.substring(0, 2).toUpperCase();
-//            }
-//        }
 
         String urlString = String.format("%sspecies=%s&state=%s", APIBase, SPECIES, state);
 
@@ -237,7 +249,6 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngCoordinates.get(latLngCoordinates.size() - 1)));
                             }
 
-//                            tvGoogleMap.setText(coordinates);
                         }
                     });
 
@@ -315,16 +326,84 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         String spatialAcc = ACCURATE_SPATIAL_ACCURACY; // TODO: Decide which spatialAcc method to use (filter/settings)
         // TODO: Add search by "commonName" because there are multiple fish in a species
         String urlString = APIBase + genusQuery + GENUS + "&" + speciesQuery + SPECIES + "&" + spatialAccQuery + spatialAcc;   // API call that will get all locations this fish can be caught
-        Log.i("Info", "URL: " + urlString);
+        Log.i("Info", "URL: " + urlString); // DEBUGGING
+        Log.i("Info", "<FishInfo> Species: " + fishInfo.getSpecies() + ", Genus: " + fishInfo.getGenus()); // DEBUGGING
 
         /* Reduce Marker Density */
         ArrayList<LatLng> addedCoordinates = new ArrayList<>();
 
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                // Grab markers from firebase
+                if (showCommunitySaves) {
+                    // Show the locations from the community
+//                    Log.i("Info", "Getting coordinates from Firebase Community..."); // DEBUGGING
+                    DatabaseReference communitySavesReference = firebase.getReference().child("CommunitySaves");
+                    communitySavesReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                // Data is each child element in the "CommunitySaves" Database Reference now
+                                String genus = null;
+                                String species = null;
+
+                                try {
+                                    genus = data.child("genus").getValue(String.class);
+                                    species = data.child("species").getValue(String.class);
+                                } catch (Exception e) {
+                                    Log.e("Error", "Could not get genus or species");
+                                }
+
+//                                Log.i("Info", "<COMMUNITY> Species: " + species + ", Genus: " + genus); // DEBUGGING
+
+                                // Check if the fish we are on matches the fish posted in the database
+                                if (fishInfo.getGenus().equals(genus) && fishInfo.getSpecies().equals(species)) {
+
+                                    Log.i("Info", "Fish Match Found On Community!"); // DEBUGGING
+
+                                    LatLng communityCoords = null;
+                                    double latitude;
+                                    double longitude;
+
+                                    try {
+                                        latitude = Double.parseDouble(data.child("latitude").getValue(String.class));
+                                        longitude = Double.parseDouble(data.child("longitude").getValue(String.class));
+                                        communityCoords = new LatLng(latitude, longitude);
+                                        Log.i("Info", "Location: " + communityCoords); // DEBUGGING
+
+                                        MarkerOptions communityMarker = new MarkerOptions()
+                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                                                .alpha(1f)
+                                                .position(communityCoords)
+                                                .title("Community Catch!");
+                                        mMap.addMarker(communityMarker);
+
+                                    } catch(Exception e) {
+                                        Log.e("Error", "Could not get Latitude or Longitude! Latitude: " + data.child("latitude").getValue(String.class) + ", Longitude: " + data.child("longitude").getValue(String.class));
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+            }
+        });
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
 
+                // TODO: Somehow the latitude and longitude appear to be switched
                 String lat = String.valueOf(latLng.latitude);
                 String lng = String.valueOf(latLng.longitude);
 
@@ -345,15 +424,14 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+
+                // TODO: Somehow the latitude and longitude appear to be switched
                 String lat = String.valueOf(marker.getPosition().latitude);
                 String lng = String.valueOf(marker.getPosition().longitude);
                 Toast.makeText(SearchForFishActivity.this, "Location:" + lat + lng, Toast.LENGTH_SHORT).show();
 
                 LatitudeClicked = lat; //update what we clicked so we can pass into next screen intent if that is the case final destination clicked
                 LongitudeClicked = lng;
-
-//                tvShowLat.setText(lat); //show it in a textview what was clicked onto the screen
-//                tvShowLong.setText(lng);
 
                 String latFormatted = locationDF.format(marker.getPosition().latitude); //format the latitude value to 5 decimal places
                 String lngFormatted = locationDF.format(marker.getPosition().longitude); //format the longitude value to 5 decimal places to display better in tv
@@ -406,8 +484,19 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                     });
 
                 } catch (Exception e){
-                    e.printStackTrace();
-                    System.out.println(e.getLocalizedMessage());
+                    Log.e("Error","Error loading the locations of the fish!");
+
+                    // This will post a command to the main UI Thread
+                    // This is necessary so that the code knows the variables for this class
+                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBarLoadResults.setVisibility(View.GONE);
+                            Toast.makeText(ctx, "Error Loading Markers!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                 }
             }
         });

@@ -28,23 +28,23 @@
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:hint="@string/length_m"
-        android:inputType="textPersonName"
+        android:importantForAutofill="no"
+        android:inputType="numberDecimal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtSaveFishName"
-        android:importantForAutofill="no" />
+        app:layout_constraintTop_toBottomOf="@+id/edtSaveFishName" />
 
     <EditText
         android:id="@+id/edtSaveWeight"
         android:layout_width="89dp"
         android:layout_height="41dp"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
         android:ems="10"
         android:hint="@string/weight_lb"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toEndOf="@+id/imgButtonTakePicture"
-        app:layout_constraintTop_toBottomOf="@+id/edtSaveFishName"
-        android:importantForAutofill="no" />
+        android:importantForAutofill="no"
+        android:inputType="numberDecimal"
+        app:layout_constraintEnd_toStartOf="@+id/edtSaveLength"
+        app:layout_constraintTop_toBottomOf="@+id/edtSaveFishName" />
 
     <EditText
         android:id="@+id/edtSaveGenus"
@@ -54,10 +54,10 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="@string/genus"
+        android:importantForAutofill="no"
         android:inputType="textPersonName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgButtonTakePicture"
-        android:importantForAutofill="no" />
+        app:layout_constraintTop_toBottomOf="@+id/edtSaveWeight" />
 
     <EditText
         android:id="@+id/edtSaveSpecies"
@@ -67,12 +67,12 @@
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:hint="@string/species"
+        android:importantForAutofill="no"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/edtSaveGenus"
-        app:layout_constraintTop_toBottomOf="@+id/imgButtonTakePicture"
-        android:importantForAutofill="no" />
+        app:layout_constraintTop_toBottomOf="@+id/edtSaveLength" />
 
     <TextView
         android:id="@+id/txtCaughtFishTitle"
@@ -144,12 +144,12 @@
         android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="@string/latitude"
-        android:inputType="textPersonName"
+        android:importantForAutofill="no"
+        android:inputType="numberDecimal"
         app:layout_constraintEnd_toStartOf="@+id/edtSaveLongitude"
         app:layout_constraintHorizontal_bias="0.744"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtSaveGenus"
-        android:importantForAutofill="no" />
+        app:layout_constraintTop_toBottomOf="@+id/edtSaveGenus" />
 
     <EditText
         android:id="@+id/edtSaveLongitude"
@@ -159,10 +159,10 @@
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:hint="@string/longitude"
-        android:inputType="textPersonName"
+        android:importantForAutofill="no"
+        android:inputType="numberDecimal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtSaveSpecies"
-        android:importantForAutofill="no" />
+        app:layout_constraintTop_toBottomOf="@+id/edtSaveSpecies" />
 
     <EditText
         android:id="@+id/edtSaveBait"
