@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="bold"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:flow_horizontalAlign="center"
@@ -39,10 +40,12 @@
             <TextView
                 android:id="@+id/textViewFBNameText"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Common Name:"
-                android:textSize="24sp" />
+                android:textColor="#2196F3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewFBNameInfo"
@@ -63,7 +66,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Species:"
-                android:textSize="24sp" />
+                android:textColor="#2196F3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewSpeciesInfo"
@@ -84,7 +89,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Genus:"
-                android:textSize="24sp" />
+                android:textColor="#2196F3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewGenusInfo"
@@ -105,7 +112,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Body Shape:"
-                android:textSize="24sp" />
+                android:textColor="#2196F3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewBodyShapeInfo"
@@ -127,7 +136,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Length:"
-                android:textSize="24sp" />
+                android:textColor="#2196F3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewLengthInfo"
@@ -149,7 +160,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Weight:"
-                android:textSize="24sp" />
+                android:textColor="#2196F3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewWeightInfo"
@@ -170,7 +183,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Dangerous:"
-                android:textSize="24sp" />
+                android:textColor="#2196F3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewDangerousInfo"
@@ -191,7 +206,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Water Type:"
-                android:textSize="24sp" />
+                android:textColor="#2196F3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewWaterTypeInfo"
@@ -210,9 +227,11 @@
                 android:id="@+id/textViewCommentsText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Comments:"
+                android:textColor="#2196F3"
                 android:textSize="24sp"
-                android:layout_weight="1" />
+                android:textStyle="bold" />
 
         </TableRow>
 
