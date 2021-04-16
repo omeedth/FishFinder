@@ -139,6 +139,7 @@ public class MainPageActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
+                    comInfoList = new ArrayList<GeneralTest>();
                     ArrayList<GeneralTest> comInfoTemp = new ArrayList<GeneralTest>();
 
                     for(DataSnapshot datas: dataSnapshot.getChildren()){
