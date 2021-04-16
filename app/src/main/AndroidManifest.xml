@@ -37,9 +37,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".FishLocationActivity"
-            android:label="@string/title_activity_fish_location" />
         <activity android:name=".FishListActivity" />
         <activity android:name=".SearchForFishActivity" />
         <activity android:name=".MainPageActivity" />

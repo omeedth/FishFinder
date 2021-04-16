@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
@@ -13,8 +15,12 @@ import android.widget.TextView;
 
 import com.example.fishfinder.adapters.FishInfoAdapter;
 import com.example.fishfinder.data.FishInfo;
+import com.example.fishfinder.util.RestAPIUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FishInfoActivity extends AppCompatActivity {
 
@@ -35,6 +41,7 @@ public class FishInfoActivity extends AppCompatActivity {
     private final String WEIGHT_UNITS = "g";
     private FishInfo fishInfo;
 
+    ExecutorService service = Executors.newFixedThreadPool(1);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +74,15 @@ public class FishInfoActivity extends AppCompatActivity {
 
         // Download Fish Image
         String img_url = fishInfo.getImage();
-        new DownloadImageTask(imageViewFish).execute(img_url);
+
+        if (fishInfo.getImageBytes() != null) {
+//            Log.i("Info", "Image Already Grabbed!");  // DEBUGGING
+            Bitmap fishImageBM = BitmapFactory.decodeByteArray(fishInfo.getImageBytes(), 0, fishInfo.getImageBytes().length);
+            imageViewFish.setImageBitmap(fishImageBM);
+        } else {
+            // Don't load image if one wasn't passed by the
+            // ListAdapter in the previous Activity
+        }
 
         // TODO: Make layout look better
         // TODO: Fix Comments overflow problem
@@ -83,37 +98,12 @@ public class FishInfoActivity extends AppCompatActivity {
 
     }
 
-    // TODO: stop using depreciated AsyncTask
-    // TODO: Consolidate! Reuse this code
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
+    @Override
+    public void onBackPressed() {
+        /* Stop Asynchronous Thread */
+        service.shutdownNow();
 
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-
-            // Check if URL is valid
-            if (!URLUtil.isValidUrl(urldisplay)) {
-//                Log.e("Error", "Invalid URL: " + urldisplay);
-                return null;
-            }
-
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in); // ERROR: Failed to create image decoder with message 'unimplemented', from Incomplete image data
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage() + ", URL: " + urldisplay);
-//                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
+        super.onBackPressed();
     }
+
 }

@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import com.example.fishfinder.data.FishInfo;
 import com.example.fishfinder.data.GeneralTest;
 import com.example.fishfinder.data.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -183,9 +184,13 @@ public class CaughtFishActivity extends AppCompatActivity {
             } else {
                 latitudeVal = extras.getString("latitude");
                 longitudeVal = extras.getString("longitude");
+                FishInfo fishInfo = (FishInfo) extras.getSerializable("fishInfo");
 
                 edtSaveLongitude.setText(longitudeVal);
                 edtSaveLatitude.setText(latitudeVal);
+                edtSaveFishName.setText(fishInfo.getFBname());
+                edtSaveGenus.setText(fishInfo.getGenus());
+                edtSaveSpecies.setText(fishInfo.getSpecies());
 
             }
         } else {
@@ -215,8 +220,8 @@ public class CaughtFishActivity extends AppCompatActivity {
                 //a database using GeneralTest as the object to inject to firebase
                 //just adding all the user submitted values to this instance of the GeneralTest class
                 GeneralTest toAdd = new GeneralTest();
-                toAdd.setLatitude(latitudeVal);
-                toAdd.setLongitude(longitudeVal);
+                toAdd.setLatitude(edtSaveLatitude.getText().toString());
+                toAdd.setLongitude(edtSaveLongitude.getText().toString());
                 toAdd.setTitle(edtSaveTitle.getText().toString());
                 toAdd.setUserId(userId);
                 toAdd.setEmail(userEmail);

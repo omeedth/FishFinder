@@ -8,10 +8,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.fishfinder.adapters.FishInfoAdapter;
 import com.example.fishfinder.data.FishInfo;
@@ -20,9 +22,14 @@ import com.example.fishfinder.util.RestAPIUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class FishListActivity extends AppCompatActivity {
 
@@ -39,11 +46,15 @@ public class FishListActivity extends AppCompatActivity {
     // FishBase API search Queries
     private final String    FishBaseSpeciesSearch = "Species="; // Search based off species names
     private final String    FishBaseFBNameSearch = "FBname=";   // Search based off of common name (Must be very accurate)
+    private final String    FishBaseLimit = "limit=";           // limit the amount of results returned
 
     // TODO: Use USGS NAS species endpoint in order to figure out all the searchable fish
     // Don't allow the user to search fish in FishBase that aren't in USGS NAS
     // USGS NAS API Endpoints
     private final String    USGS_NAS_API_SPECIES_ENDPOINT = "https://nas.er.usgs.gov/api/v2/species"; // We can use this by itself to get all species, or append "/{key}" where key is the species ID
+
+    private final int DEFAULT_RECORD_COUNT = 10000; // Just a randomly chosen number as the default for how many records FishBase has
+    private int TOTAL_FISHBASE_RECORDS;             // The actual total number of records FishBase Has
 
     /* Components */
     private EditText editTextSearchFish;
@@ -60,9 +71,11 @@ public class FishListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fish_list);
 
+//        Log.i("Info", "OnCreate!"); // DEBUGGING
+
         /* Initialize Variables */
         ctx = this.getBaseContext();
-        fishInfoAdapter = new FishInfoAdapter(ctx, R.layout.list_view_fish_info, new ArrayList<FishInfo>());
+        fishInfoAdapter = new FishInfoAdapter(ctx, R.layout.list_view_fish_info, new ArrayList<FishInfo>()); // , service
 
         /* Initializing Components */
         listViewFishInfo = (ListView) findViewById(R.id.listViewFishInfo);
@@ -75,90 +88,115 @@ public class FishListActivity extends AppCompatActivity {
         listViewFishInfo.setAdapter(fishInfoAdapter); // Setting the ListAdapter which will populate the ListView
         progressBarFishSearch.setVisibility(View.GONE);
 
+        // Figure out how many records are in the FishBase API
+        // FishBase API has a "count" key when you query for species which is the number of records
+        TOTAL_FISHBASE_RECORDS = DEFAULT_RECORD_COUNT;
+        int limit = 1;
+        try {
+            // TODO: Consider making RestAPIUtil.get() return Future<String> so that we can wait for the result
+            int recordCount = service.submit(new Callable<Integer>() {
+                @Override
+                public Integer call() throws Exception {
+                    int result = -1;
+
+                    String content = RestAPIUtil.get(FishBaseAPIBase + FishBaseAPISpecies + FishBaseLimit + limit);
+                    JSONObject jsonObj = new JSONObject(content);
+                    result = jsonObj.getInt("count");
+
+                    return result;
+                }
+            }).get(3, TimeUnit.SECONDS);
+            TOTAL_FISHBASE_RECORDS = recordCount;
+            Log.i("Debug","Total FishBase Records: " + TOTAL_FISHBASE_RECORDS); // DEBUGGING
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            Log.e("Error",e.getLocalizedMessage());
+        }
+
         /* Add Listeners */
+        // OnClickListeners should be in the OnCreate, OnStart, or OnResume, because those are always called
+        // https://stackoverflow.com/questions/43336253/why-is-the-setonclicklistener-has-to-be-inside-the-oncreate
 
         // Calls FishBase API to search for info on Fish based on Species
         buttonSearchForFish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-            // TODO: Stop ExecutorService from running previous jobs when we add another job (Or switch activities)
+                // TODO: Stop ExecutorService from running previous jobs when we add another job (Or switch activities)
 
-            final String DEFAULT_SPECIES = "cyanellus"; // TODO: Change the default
+                final String DEFAULT_SPECIES = "cyanellus"; // TODO: Change the default
 
-            /* Clear List Adapter */
-            fishInfoAdapter.clear();
+                /* Reset ExecutorService */
+                service.shutdownNow();
+                service = Executors.newFixedThreadPool(1);
+                fishInfoAdapter.setParentActivityService(service);
 
-            /* Extract Text */
-            speciesEntered = cleanSpeciesSearch(editTextSearchFish.getText().toString());
-            fishNameEntered = editTextFishNameSearch.getText().toString().trim();
+                /* Clear List Adapter */
+                fishInfoAdapter.clear();
 
-            /* Get Fish Info */
-            if (speciesEntered.equals("")) speciesEntered = DEFAULT_SPECIES;
+                /* Extract Text */
+                speciesEntered = cleanSpeciesSearch(editTextSearchFish.getText().toString());
+                fishNameEntered = editTextFishNameSearch.getText().toString().trim();
 
-            // If fish Name is entered then search by Fish Name
-            if (fishNameEntered.length() > 0) {
+                /* Get Fish Info */
+                if (speciesEntered.equals("")) speciesEntered = DEFAULT_SPECIES;
 
-//                RestAPIUtil.get(FishBaseAPIBase + FishBaseAPISpecies);
-                // TODO: get the number of records in FishBase by calling the API
-                int endPoint = 34571;   // How many records will we try to search for (Max Value means going through all records) // HARDCODED TO MAX RESULTS RIGHT NOW
-                int offset = 0;         // Where we start searching from
-                int batchSize = 1000;    // How many records we search per query
+                // If fish Name is entered then search by Fish Name
+                if (fishNameEntered.length() > 0) {
 
-                progressBarFishSearch.setProgress(0);
-                progressBarFishSearch.setMax(endPoint);
-                progressBarFishSearch.setVisibility(View.VISIBLE);
+                    // TODO: get the number of records in FishBase by calling the API
+                    int endPoint = TOTAL_FISHBASE_RECORDS;   // How many records will we try to search for (Max Value means going through all records) // 34571 HARDCODED TO MAX RESULTS RIGHT NOW
+                    int offset = 0;         // Where we start searching from
+                    int batchSize = 1000;    // How many records we search per query
 
-                getFishInfoFromTo(offset, batchSize, endPoint, fishNameEntered);
+                    progressBarFishSearch.setProgress(0);
+                    progressBarFishSearch.setMax(endPoint);
+                    progressBarFishSearch.setVisibility(View.VISIBLE);
 
-            } else if (speciesEntered.length() > 0) {
-                getFishInfo(speciesEntered);
-            } else {
-                // Nothing was entered in any field
+                    getFishInfoFromTo(offset, batchSize, endPoint, fishNameEntered);
 
-                // TODO: Call the USGS NAS API to obtain all species
-
-                // TODO: For each species from USGS NAS, pass the common name into FishBase API in order to get more info on fish
-
-                // TODO: Fill ListView with data after collecting info from both APIs
-            }
+                } else if (speciesEntered.length() > 0) {
+                    getFishInfo(speciesEntered);
+                } else {
+                    Toast.makeText(ctx, "Please Enter a value before searching!", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
 
+        // https://stackoverflow.com/questions/5551042/onitemclicklistener-not-working-in-listview (OnItemClickListener won't work if the Items contains focusable or clickable elements)
 //        listViewFishInfo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                FishInfo fishInfo = (FishInfo) parent.getItemAtPosition(position);
-//
-//                service.shutdownNow();
-//
-//                Log.i("Debug", "Clicked On List Item");
-//
-////                /* If we clicked */
-////                if (view.equals(parent.findViewById(R.id.buttonShowInfo))) {
-////                    Log.i("Debug", "Show Fish Info");
-////
-////                } else {
-////
-////                    /* Go to Map Activity */
-////
-////                    Intent goToSearchForFishActivity = new Intent(view.getContext(), SearchForFishActivity.class);
-////                    goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
-////
-////                    //based on item add info to intent
-////                    startActivity(goToSearchForFishActivity);
-////
-////                }
-//
-//                Intent goToSearchForFishActivity = new Intent(view.getContext(), SearchForFishActivity.class);
-//                goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
-//
-//                //based on item add info to intent
-//                startActivity(goToSearchForFishActivity);
-//            }
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {}
 //        });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        Log.i("Info", "OnStart!"); // DEBUGGING
+
+        // Restart the ExecutorService if it is terminated
+        if(service.isShutdown()) {
+            Log.i("Info","Service is shutdown... Reinitializing Service!");
+            service = Executors.newFixedThreadPool(1);
+            fishInfoAdapter.setParentActivityService(service);
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        Log.i("Info", "OnResume!"); // DEBUGGING
+    }
+
+    @Override
+    public void onBackPressed() {
+        /* Stop Asynchronous Thread */
+        service.shutdownNow();
+
+        super.onBackPressed();
     }
 
     /**
@@ -280,9 +318,10 @@ public class FishListActivity extends AppCompatActivity {
                 fishInfo.setDangerous(element.getString("Dangerous"));
                 fishInfo.setComments(element.getString("Comments"));
 
-                // 0: is a freshwater or saltwater fish, -1: NOT a freshwater or saltwater fish
-                fishInfo.setFresh(element.getInt("Fresh") == 0);
-                fishInfo.setSaltwater(element.getInt("Saltwater") == 0);
+                // 0: False (AKA NOT a fresh or salt water fish), -1: True (AKA IS a fresh or salt water fish) (This is info I assume after going over records of FishBase API)
+                int TRUE = -1;
+                fishInfo.setFresh(element.getInt("Fresh") == TRUE);
+                fishInfo.setSaltwater(element.getInt("Saltwater") == TRUE);
 
                 // Add FishInfo to FishInfoList
                 fishInfoList.add(fishInfo);
@@ -358,57 +397,61 @@ public class FishListActivity extends AppCompatActivity {
 //            Toast.makeText(ctx, ("Start: " + offset  + ", End: " + (offset + limit)), Toast.LENGTH_SHORT).show();
 
             // Fetch data from API and save into FishInfoList based off of Filter
-            try {
-                service.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
+            service.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
 
-                            /* Send GET Request to obtain data from URL, and parse as JSON */
-                            String content = RestAPIUtil.get(completeAPICall);
-                            ArrayList<FishInfo> fishInfoFromAPI = parseFishInfo(content);
-                            ArrayList<FishInfo> filteredFishInfo = new ArrayList<>();
+                        /* Send GET Request to obtain data from URL, and parse as JSON */
+                        String content = RestAPIUtil.get(completeAPICall);
+                        ArrayList<FishInfo> fishInfoFromAPI = parseFishInfo(content);
+                        ArrayList<FishInfo> filteredFishInfo = new ArrayList<>();
 
-                            // Check to see if name contains the string, and add it to the list if so
-                            for (FishInfo fishInfo : fishInfoFromAPI) {
+                        // Check to see if name contains the string, and add it to the list if so
+                        for (FishInfo fishInfo : fishInfoFromAPI) {
 //                                System.out.println("Fish Name: " + fishInfo.getFBname());
-                                if (fishInfo.getFBname().toLowerCase().contains(lowerCaseNameRegex)) filteredFishInfo.add(fishInfo);
-                            }
-
-                            // This will post a command to the main UI Thread
-                            // This is necessary so that the code knows the variables for this class
-                            // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                    if (filteredFishInfo.size() > 0) {
-//                                        Log.i("Info", "Fish Found: " + filteredFishInfo.toString());
-                                        fishInfoAdapter.addAll(filteredFishInfo);
-                                        fishInfoAdapter.notifyDataSetChanged();
-                                        Log.i("Info", "Fish Found: " + fishInfoAdapter.getCount() + ", Adapter: " + fishInfoAdapter.toString());
-                                    }
-
-                                    progressBarFishSearch.incrementProgressBy(limit);
-
-                                    /* Remove Progress Bar if fully loaded */
-                                    if (progressBarFishSearch.getProgress() >= progressBarFishSearch.getMax()) {
-                                        progressBarFishSearch.setVisibility(View.GONE);
-                                    }
-
-                                }
-                            });
-
-                        } catch(Exception e) {
-                            e.printStackTrace();
-                            System.out.println(e.getLocalizedMessage());
+                            if (fishInfo.getFBname().toLowerCase().contains(lowerCaseNameRegex)) filteredFishInfo.add(fishInfo);
                         }
+
+                        // This will post a command to the main UI Thread
+                        // This is necessary so that the code knows the variables for this class
+                        // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                if (filteredFishInfo.size() > 0) {
+//                                        Log.i("Info", "Fish Found: " + filteredFishInfo.toString());
+                                    fishInfoAdapter.addAll(filteredFishInfo);
+                                    fishInfoAdapter.notifyDataSetChanged();
+                                    Log.i("Info", "Fish Found: " + fishInfoAdapter.getCount() + ", Adapter: " + fishInfoAdapter.toString());
+                                }
+
+                                progressBarFishSearch.incrementProgressBy(limit);
+
+                                /* Remove Progress Bar if fully loaded */
+                                if (progressBarFishSearch.getProgress() >= progressBarFishSearch.getMax()) {
+                                    progressBarFishSearch.setVisibility(View.GONE);
+                                }
+
+                            }
+                        });
+
+                    } catch(IOException e) {
+                        Log.e("Error", "Error fetching data from REST API asynchronously... Was possibly interrupted! (FishListActivity)");
+
+                        // This will post a command to the main UI Thread
+                        // This is necessary so that the code knows the variables for this class
+                        // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBarFishSearch.setVisibility(View.GONE);
+                            }
+                        });
                     }
-                });
-            } catch (Exception e) {
-                fishinfoList = new ArrayList<FishInfo>();
-                e.printStackTrace();
-            }
+                }
+            });
 
             // Increment offset by limit (how many entries we searched for)
             offset += limit;
