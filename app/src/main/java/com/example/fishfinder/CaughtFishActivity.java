@@ -233,10 +233,18 @@ public class CaughtFishActivity extends AppCompatActivity {
                 toAdd.setVets(1);//you like it yourself and vet it yourself
                 ArrayList<String> arrvetby = new ArrayList<String>();
                 ArrayList<String> arrlikeby = new ArrayList<String>();
+                ArrayList<String> comments = new ArrayList<String>();
+                ArrayList<String> commentsBy = new ArrayList<String>();
                 arrvetby.add(userId);
                 arrlikeby.add(userId);
+                comments.add(edtSaveUserComments.getText().toString());
+                commentsBy.add(userId);
                 toAdd.setVettedby(arrvetby);
                 toAdd.setLikedby(arrlikeby);
+
+                toAdd.setComments(comments); //mirroring arrays
+                toAdd.setCommentsBy(commentsBy);//mirroring arrays
+
                 //All values set, proceed to publishing this.
 
 

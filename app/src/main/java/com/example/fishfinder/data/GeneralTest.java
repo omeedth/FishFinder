@@ -29,6 +29,8 @@ public class GeneralTest implements Serializable {
     List vettedby;
     int likes;
     int vets;
+    List comments;
+    List commentsBy;
 
     //not added yet
 //    boolean freshwater;
@@ -52,6 +54,8 @@ public class GeneralTest implements Serializable {
 
         this.likedby = new ArrayList(); //init Arrays to be 0 so it has nothing so far we will update size as we go.
         this.vettedby = new ArrayList();
+        this.commentsBy = new ArrayList<>();
+        this.comments = new ArrayList();
         this.vets = 0;
         this.likes = 0;
         this.username = "";
@@ -210,6 +214,22 @@ public class GeneralTest implements Serializable {
 
     public void setVettedby(List vettedby) {
         this.vettedby = vettedby;
+    }
+
+    public List getComments() {
+        return comments;
+    }
+
+    public void setComments(List comments) {
+        this.comments = comments;
+    }
+
+    public List getCommentsBy() {
+        return commentsBy;
+    }
+
+    public void setCommentsBy(List commentsBy) {
+        this.commentsBy = commentsBy;
     }
 
     //    public boolean isFreshwater() {
