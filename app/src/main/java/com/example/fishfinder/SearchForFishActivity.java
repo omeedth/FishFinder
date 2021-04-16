@@ -184,6 +184,14 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
     }
 
+    @Override
+    public void onBackPressed() {
+        /* Stop Asynchronous Thread */
+        service.shutdownNow();
+
+        super.onBackPressed();
+    }
+
     private void getCordinates(String str) {
 //        String[] pieces = str.trim().split(",");
 

@@ -41,6 +41,7 @@ public class FishInfoActivity extends AppCompatActivity {
     private final String WEIGHT_UNITS = "g";
     private FishInfo fishInfo;
 
+    ExecutorService service = Executors.newFixedThreadPool(1);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,36 +81,35 @@ public class FishInfoActivity extends AppCompatActivity {
             Bitmap fishImageBM = BitmapFactory.decodeByteArray(fishInfo.getImageBytes(), 0, fishInfo.getImageBytes().length);
             imageViewFish.setImageBitmap(fishImageBM);
         } else {
-            ExecutorService service = Executors.newFixedThreadPool(1);
-            service.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Bitmap fishImageBM = RestAPIUtil.getImage(img_url);
-
-                    /* Compressing image to bytes (if we get an image) */
-                    if (fishImageBM != null) {
-
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        fishImageBM.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        byte[] imageBytes = stream.toByteArray();
-
-                        // Adding the image bytes to FishInfo
-                        fishInfo.setImageBytes(imageBytes);
-
-                    }
-
-                    // This will post a command to the main UI Thread
-                    // This is necessary so that the code knows the variables for this class
-                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            imageViewFish.setImageBitmap(fishImageBM);
-                        }
-                    });
-
-                }
-            });
+//            service.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Bitmap fishImageBM = RestAPIUtil.getImage(img_url);
+//
+//                    /* Compressing image to bytes (if we get an image) */
+//                    if (fishImageBM != null) {
+//
+//                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                        fishImageBM.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//                        byte[] imageBytes = stream.toByteArray();
+//
+//                        // Adding the image bytes to FishInfo
+//                        fishInfo.setImageBytes(imageBytes);
+//
+//                    }
+//
+//                    // This will post a command to the main UI Thread
+//                    // This is necessary so that the code knows the variables for this class
+//                    // https://stackoverflow.com/questions/27737769/how-to-properly-use-a-handler
+//                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            imageViewFish.setImageBitmap(fishImageBM);
+//                        }
+//                    });
+//
+//                }
+//            });
         }
 
         // TODO: Make layout look better
@@ -126,7 +126,15 @@ public class FishInfoActivity extends AppCompatActivity {
 
     }
 
-//    // TODO: stop using depreciated AsyncTask
+    @Override
+    public void onBackPressed() {
+        /* Stop Asynchronous Thread */
+        service.shutdownNow();
+
+        super.onBackPressed();
+    }
+
+    //    // TODO: stop using depreciated AsyncTask
 //    // TODO: Consolidate! Reuse this code
 //    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 //        ImageView bmImage;

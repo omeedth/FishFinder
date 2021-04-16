@@ -45,7 +45,7 @@ import java.util.concurrent.TimeoutException;
 public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
 
     /* Variables */
-//    ExecutorService service = Executors.newFixedThreadPool(1);
+    ExecutorService service = Executors.newFixedThreadPool(1);
     ArrayList<FishInfo> fishInfoList = new ArrayList<>();
     ArrayList<Bitmap> fishImageList = new ArrayList<>();
     Context activityContext;
@@ -124,15 +124,19 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
 
                 /* If the parent activity has other processes running on the other thread, terminate all of them */
                 if (parentActivityService != null) {
-                    parentActivityService.shutdownNow();
+//                    parentActivityService.shutdownNow();
                 }
 
-                Intent goToFishInfoActivity = new Intent(v.getContext(), FishInfoActivity.class);
-                goToFishInfoActivity.putExtra("fishInfo", fishInfo);
+                try {
+                    Intent goToFishInfoActivity = new Intent(v.getContext(), FishInfoActivity.class);
+                    goToFishInfoActivity.putExtra("fishInfo", fishInfo);
 
-                // based on item add info to intent
-                goToFishInfoActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);   // This flag is required to be added to activity for us to navigate there from this class
-                activityContext.startActivity(goToFishInfoActivity);
+                    // based on item add info to intent
+                    goToFishInfoActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);   // This flag is required to be added to activity for us to navigate there from this class
+                    activityContext.startActivity(goToFishInfoActivity);
+                } catch (Exception e) {
+                    Log.e("Error", e.getLocalizedMessage());
+                }
 
             }
         });
@@ -143,15 +147,19 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
 
                 /* If the parent activity has other processes running on the other thread, terminate all of them */
                 if (parentActivityService != null) {
-                    parentActivityService.shutdownNow();
+//                    parentActivityService.shutdownNow();
                 }
 
-                Intent goToSearchForFishActivity = new Intent(v.getContext(), SearchForFishActivity.class);
-                goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
+                try {
+                    Intent goToSearchForFishActivity = new Intent(v.getContext(), SearchForFishActivity.class);
+                    goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
 
-                //based on item add info to intent
-                goToSearchForFishActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  // This flag is required to be added to activity for us to navigate there from this class
-                activityContext.startActivity(goToSearchForFishActivity);
+                    //based on item add info to intent
+                    goToSearchForFishActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  // This flag is required to be added to activity for us to navigate there from this class
+                    activityContext.startActivity(goToSearchForFishActivity);
+                } catch (Exception e) {
+                    Log.e("Error", e.getLocalizedMessage());
+                }
 
             }
         });
@@ -209,7 +217,7 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
 
             Log.i("Info", "Grabbing Fish Image for Position: " + position);
 
-            ExecutorService service = Executors.newFixedThreadPool(1);
+//            ExecutorService service = Executors.newFixedThreadPool(1);
             service.execute(new Runnable() {
                 @Override
                 public void run() {

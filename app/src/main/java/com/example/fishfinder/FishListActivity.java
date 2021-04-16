@@ -108,7 +108,7 @@ public class FishListActivity extends AppCompatActivity {
             TOTAL_FISHBASE_RECORDS = recordCount;
             Log.i("Debug","Total FishBase Records: " + TOTAL_FISHBASE_RECORDS); // DEBUGGING
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            e.printStackTrace();
+            Log.e("Error",e.getLocalizedMessage());
         }
 
         /* Add Listeners */
@@ -195,6 +195,14 @@ public class FishListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 //        Log.i("Info", "OnResume!"); // DEBUGGING
+    }
+
+    @Override
+    public void onBackPressed() {
+        /* Stop Asynchronous Thread */
+        service.shutdownNow();
+
+        super.onBackPressed();
     }
 
     /**
@@ -436,7 +444,7 @@ public class FishListActivity extends AppCompatActivity {
                         });
 
                     } catch(IOException e) {
-                        Log.e("Error", "Error fetching data from REST API asynchronously... Was possibly interrupted!");
+                        Log.e("Error", "Error fetching data from REST API asynchronously... Was possibly interrupted! (FishListActivity)");
 
                         // This will post a command to the main UI Thread
                         // This is necessary so that the code knows the variables for this class
