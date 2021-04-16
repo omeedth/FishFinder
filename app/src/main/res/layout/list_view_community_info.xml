@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    >
+
+    <ImageView
+        android:id="@+id/imgComCaughtImage"
+        android:layout_width="0dp"
+        android:layout_weight="0.25"
+        android:layout_height="100dp"
+        android:padding="5dp" />
+
+    <TextView
+        android:id="@+id/txtComDesc"
+        android:layout_width="0dp"
+        android:layout_weight="0.25"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Demo"
+        android:textAlignment="center"
+        android:textColor="#000"
+        android:textSize="10dp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="0.25"
+        >
+        <Button
+            android:id="@+id/btnComShowInfo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Show Info" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnComVet"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Vet"
+                android:textSize="12dp"
+                />
+
+            <Button
+                android:id="@+id/btnComLike"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Like"
+                android:textSize="12dp" />
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+</LinearLayout>

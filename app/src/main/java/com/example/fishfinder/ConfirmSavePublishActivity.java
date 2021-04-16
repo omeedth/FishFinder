@@ -1,6 +1,7 @@
 package com.example.fishfinder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -52,6 +53,10 @@ public class ConfirmSavePublishActivity extends AppCompatActivity {
     String bait;
     String bodyshape;
     String usercomment;
+    String username;
+
+    GeneralTest toAdd;
+
 
     FirebaseDatabase firebase;
 
@@ -60,6 +65,8 @@ public class ConfirmSavePublishActivity extends AppCompatActivity {
 
     private int profileSavesDatabaseSize;
     private int communitySaveDatabaseSize;
+
+    SharedPreferences pref;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,64 +82,72 @@ public class ConfirmSavePublishActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
+        toAdd = new GeneralTest();
+
+        pref = getSharedPreferences("UserSettings", MODE_PRIVATE);
 
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
 //                latitudeVal = "";
 //                longitudeVal = "";
-                imgId = "";
-                latitude = "";
-                longitude = "";
-                title = "";
-                userId = "";
-                email = "";
-                fishname = "";
-                weight = "";
-                length = "";
-                species = "";
-                genus = "";
-                bait = "";
-                bodyshape = "";
-                usercomment = "";
+//                imgId = "";
+//                latitude = "";
+//                longitude = "";
+//                title = "";
+//                userId = "";
+//                email = "";
+//                fishname = "";
+//                weight = "";
+//                length = "";
+//                species = "";
+//                genus = "";
+//                bait = "";
+//                bodyshape = "";
+//                usercomment = "";
+//                username = "";
+                toAdd = new GeneralTest();
 
             } else {
                 //grab all the data values from previous activity
-                imgId = extras.getString("imgId");
-                latitude = extras.getString("latitude");
-                longitude = extras.getString("longitude");
-                title = extras.getString("title");
-                userId = extras.getString("userId");
-                email = extras.getString("email");
-                fishname = extras.getString("fishname");
-                weight = extras.getString("weight");
-                length = extras.getString("length");
-                species = extras.getString("species");
-                genus = extras.getString("genus");
-                bait = extras.getString("bait");
-                bodyshape = extras.getString("bodyshape");
-                usercomment = extras.getString("usercomment");
+//                imgId = extras.getString("imgId");
+//                latitude = extras.getString("latitude");
+//                longitude = extras.getString("longitude");
+//                title = extras.getString("title");
+//                userId = extras.getString("userId");
+//                email = extras.getString("email");
+//                fishname = extras.getString("fishname");
+//                weight = extras.getString("weight");
+//                length = extras.getString("length");
+//                species = extras.getString("species");
+//                genus = extras.getString("genus");
+//                bait = extras.getString("bait");
+//                bodyshape = extras.getString("bodyshape");
+//                usercomment = extras.getString("usercomment");
+//                username = extras.getString("username");
+                toAdd = (GeneralTest) extras.getSerializable("toAdd"); //get the object itself
 
             }
         } else {
 //            newString= (String) savedInstanceState.getSerializable("STRING_I_NEED");
         }
 
-        GeneralTest toAdd = new GeneralTest();
-        toAdd.setImgId(imgId);
-        toAdd.setLatitude(latitude);
-        toAdd.setLongitude(longitude);
-        toAdd.setTitle(title);
-        toAdd.setUserId(userId);
-        toAdd.setEmail(email);
-        toAdd.setFishname(fishname);
-        toAdd.setWeight(weight);
-        toAdd.setLength(length);
-        toAdd.setSpecies(species);
-        toAdd.setGenus(genus);
-        toAdd.setBait(bait);
-        toAdd.setBodyshape(bodyshape);
-        toAdd.setUsercomment(usercomment);
+//        GeneralTest toAdd = new GeneralTest();
+//        toAdd.setImgId(imgId);
+//        toAdd.setLatitude(latitude);
+//        toAdd.setLongitude(longitude);
+//        toAdd.setTitle(title);
+//        toAdd.setUserId(userId);
+//        toAdd.setEmail(email);
+//        toAdd.setFishname(fishname);
+//        toAdd.setWeight(weight);
+//        toAdd.setLength(length);
+//        toAdd.setSpecies(species);
+//        toAdd.setGenus(genus);
+//        toAdd.setBait(bait);
+//        toAdd.setBodyshape(bodyshape);
+//        toAdd.setUsercomment(usercomment);
+//        toAdd.setUsername(username);
 
 
         firebase.getReference("ProfileSaves").addValueEventListener(new ValueEventListener() {

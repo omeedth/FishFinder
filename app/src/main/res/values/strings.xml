@@ -46,4 +46,15 @@
     <string name="bait">Bait</string>
     <string name="body_shape">Body Shape</string>
     <string name="user_comments">User Comments</string>
+    <string name="settings">Settings:</string>
+    <string name="default_settings">Default Settings</string>
+    <string name="ask_to_save">Ask To Save?:</string>
+    <string name="public_postings_visibility">Public Postings Visibility:</string>
+    <string name="off">Off</string>
+    <string name="never">Never</string>
+    <string name="no">No</string>
+    <string name="confirm_settings">Confirm Settings</string>
+    <string name="sync_data_automatically">Sync data automatically?</string>
+    <string name="ask_to_post_publicly">Ask to post publicly?</string>
+    <string name="visible">Visible</string>
 </resources>

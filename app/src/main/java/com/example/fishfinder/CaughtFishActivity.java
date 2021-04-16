@@ -1,6 +1,7 @@
 package com.example.fishfinder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -27,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -34,6 +36,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class CaughtFishActivity extends AppCompatActivity {
@@ -66,7 +71,7 @@ public class CaughtFishActivity extends AppCompatActivity {
     FirebaseUser firebaseUser;
     String userId;
     String userEmail;
-
+    String username;
 
 
     private Bitmap bitMapToSave;
@@ -76,6 +81,8 @@ public class CaughtFishActivity extends AppCompatActivity {
     private int fishImageStorageSize;
 
     private boolean successfulUpload;
+
+    SharedPreferences pref;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,15 +100,12 @@ public class CaughtFishActivity extends AppCompatActivity {
         edtSaveBait = (EditText) findViewById(R.id.edtSaveBait);
         edtSaveBodyShape = (EditText) findViewById(R.id.edtSaveBodyShape);
         edtSaveUserComments = (EditText) findViewById(R.id.edtSaveUserComments);
-
-
-
         edtSaveLatitude = (EditText) findViewById(R.id.edtSaveLatitude);
         edtSaveLongitude = (EditText) findViewById(R.id.edtSaveLongitude);
 
+        pref = getSharedPreferences("UserSettings", MODE_PRIVATE);
 
         firebase = FirebaseDatabase.getInstance(); //get the root node point of the database, this is so we can get the references based on the root node to get the desired data references
-
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
 
@@ -145,6 +149,28 @@ public class CaughtFishActivity extends AppCompatActivity {
             }
         });
 
+        username = ""; //init username to this first and let the next step handle finding it
+        DatabaseReference usersref= FirebaseDatabase.getInstance().getReference().child("Users");
+        usersref.addValueEventListener(new ValueEventListener(){
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot datas: dataSnapshot.getChildren()){
+                    //look for the username of the user so we can display it
+                    String theCurrentId = datas.getValue().toString();
+                    if (theCurrentId.equals(userId)) {
+                        //if the userId matches this child value we found it so set the username for the user
+                        username = datas.child(theCurrentId).getValue().toString(); //set the username for this person
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
 
 
@@ -155,8 +181,8 @@ public class CaughtFishActivity extends AppCompatActivity {
                 longitudeVal = "";
 
             } else {
-                longitudeVal = extras.getString("latitude");
-                latitudeVal = extras.getString("longitude");
+                latitudeVal = extras.getString("latitude");
+                longitudeVal = extras.getString("longitude");
 
                 edtSaveLongitude.setText(longitudeVal);
                 edtSaveLatitude.setText(latitudeVal);
@@ -187,7 +213,7 @@ public class CaughtFishActivity extends AppCompatActivity {
                 successfulUpload = false;
 
                 //a database using GeneralTest as the object to inject to firebase
-                //just adding all the user submitted values to this class
+                //just adding all the user submitted values to this instance of the GeneralTest class
                 GeneralTest toAdd = new GeneralTest();
                 toAdd.setLatitude(latitudeVal);
                 toAdd.setLongitude(longitudeVal);
@@ -202,8 +228,16 @@ public class CaughtFishActivity extends AppCompatActivity {
                 toAdd.setBait(edtSaveBait.getText().toString());
                 toAdd.setBodyshape(edtSaveBodyShape.getText().toString());
                 toAdd.setUsercomment(edtSaveUserComments.getText().toString());
-
-                //still need to add stuff like, likes = 0, image etc
+                toAdd.setUsername(username);
+                toAdd.setLikes(1);
+                toAdd.setVets(1);//you like it yourself and vet it yourself
+                ArrayList<String> arrvetby = new ArrayList<String>();
+                ArrayList<String> arrlikeby = new ArrayList<String>();
+                arrvetby.add(userId);
+                arrlikeby.add(userId);
+                toAdd.setVettedby(arrvetby);
+                toAdd.setLikedby(arrlikeby);
+                //All values set, proceed to publishing this.
 
 
 // //               firebase.getReference("GeneralTest").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -255,20 +289,22 @@ public class CaughtFishActivity extends AppCompatActivity {
                             Intent goToConfirmSavePublishActivity = new Intent(v.getContext(), ConfirmSavePublishActivity.class);
 
                              //tossing everything to next page
-                            goToConfirmSavePublishActivity.putExtra("imgId", toAdd.getImgId());
-                            goToConfirmSavePublishActivity.putExtra("latitude", toAdd.getLatitude());
-                            goToConfirmSavePublishActivity.putExtra("longitude", toAdd.getLongitude());
-                            goToConfirmSavePublishActivity.putExtra("title", toAdd.getTitle());
-                            goToConfirmSavePublishActivity.putExtra("userId", toAdd.getUserId());
-                            goToConfirmSavePublishActivity.putExtra("email", toAdd.getEmail());
-                            goToConfirmSavePublishActivity.putExtra("fishname", toAdd.getFishname());
-                            goToConfirmSavePublishActivity.putExtra("weight", toAdd.getWeight());
-                            goToConfirmSavePublishActivity.putExtra("length", toAdd.getLength());
-                            goToConfirmSavePublishActivity.putExtra("species", toAdd.getSpecies());
-                            goToConfirmSavePublishActivity.putExtra("genus", toAdd.getGenus());
-                            goToConfirmSavePublishActivity.putExtra("bait", toAdd.getBait());
-                            goToConfirmSavePublishActivity.putExtra("bodyshape", toAdd.getBodyshape());
-                            goToConfirmSavePublishActivity.putExtra("usercomment", toAdd.getUsercomment());
+//                            goToConfirmSavePublishActivity.putExtra("imgId", toAdd.getImgId());
+//                            goToConfirmSavePublishActivity.putExtra("latitude", toAdd.getLatitude());
+//                            goToConfirmSavePublishActivity.putExtra("longitude", toAdd.getLongitude());
+//                            goToConfirmSavePublishActivity.putExtra("title", toAdd.getTitle());
+//                            goToConfirmSavePublishActivity.putExtra("userId", toAdd.getUserId());
+//                            goToConfirmSavePublishActivity.putExtra("email", toAdd.getEmail());
+//                            goToConfirmSavePublishActivity.putExtra("fishname", toAdd.getFishname());
+//                            goToConfirmSavePublishActivity.putExtra("weight", toAdd.getWeight());
+//                            goToConfirmSavePublishActivity.putExtra("length", toAdd.getLength());
+//                            goToConfirmSavePublishActivity.putExtra("species", toAdd.getSpecies());
+//                            goToConfirmSavePublishActivity.putExtra("genus", toAdd.getGenus());
+//                            goToConfirmSavePublishActivity.putExtra("bait", toAdd.getBait());
+//                            goToConfirmSavePublishActivity.putExtra("bodyshape", toAdd.getBodyshape());
+//                            goToConfirmSavePublishActivity.putExtra("usercomment", toAdd.getUsercomment());
+//                            goToConfirmSavePublishActivity.putExtra("username", toAdd.getUsername());
+                            goToConfirmSavePublishActivity.putExtra("toAdd", (Serializable) toAdd); //just pass the object to the next page
 
                             startActivity(goToConfirmSavePublishActivity);//go to Save on profile and/or publish on community page
                         }
