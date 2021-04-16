@@ -1,7 +1,11 @@
 package com.example.fishfinder.data;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 //a test save class to save to database
-public class GeneralTest {
+public class GeneralTest implements Serializable {
 
     String userId;
     String email;
@@ -19,6 +23,14 @@ public class GeneralTest {
     String bait;
     String bodyshape;
     String usercomment;
+
+    String username;
+    List likedby;
+    List vettedby;
+    int likes;
+    int vets;
+    List comments;
+    List commentsBy;
 
     //not added yet
 //    boolean freshwater;
@@ -39,6 +51,14 @@ public class GeneralTest {
         this.bait = "";
         this.bodyshape = "";
         this.usercomment = "";
+
+        this.likedby = new ArrayList(); //init Arrays to be 0 so it has nothing so far we will update size as we go.
+        this.vettedby = new ArrayList();
+        this.commentsBy = new ArrayList<>();
+        this.comments = new ArrayList();
+        this.vets = 0;
+        this.likes = 0;
+        this.username = "";
 
     }
 
@@ -154,7 +174,65 @@ public class GeneralTest {
         this.usercomment = usercomment;
     }
 
-//    public boolean isFreshwater() {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getVets() {
+        return vets;
+    }
+
+    public void setVets(int vets) {
+        this.vets = vets;
+    }
+
+    public List getLikedby() {
+        return likedby;
+    }
+
+    public void setLikedby(List likedby) {
+        this.likedby = likedby;
+    }
+
+    public List getVettedby() {
+        return vettedby;
+    }
+
+    public void setVettedby(List vettedby) {
+        this.vettedby = vettedby;
+    }
+
+    public List getComments() {
+        return comments;
+    }
+
+    public void setComments(List comments) {
+        this.comments = comments;
+    }
+
+    public List getCommentsBy() {
+        return commentsBy;
+    }
+
+    public void setCommentsBy(List commentsBy) {
+        this.commentsBy = commentsBy;
+    }
+
+    //    public boolean isFreshwater() {
 //        return freshwater;
 //    }
 //
@@ -178,3 +256,5 @@ public class GeneralTest {
 //        this.weather = weather;
 //    }
 }
+
+
