@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/ProfileItems"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -36,7 +37,7 @@
                 android:layout_height="16dp" />
 
             <TextView
-                android:id="@+id/txtProfilePassword"
+                android:id="@+id/txtProfileEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Profile Email" />
@@ -54,7 +55,7 @@
             <ListView
                 android:id="@+id/lvSavedFishes"
                 android:layout_width="217dp"
-                android:layout_height="334dp" >
+                android:layout_height="334dp">
 
             </ListView>
 
