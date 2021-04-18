@@ -35,7 +35,6 @@
         app:layout_constraintBottom_toTopOf="@+id/lvCommunity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
     <ListView
         android:id="@+id/lvCommunity"
         android:layout_width="match_parent"
@@ -57,5 +56,6 @@
         android:text="@string/logout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
