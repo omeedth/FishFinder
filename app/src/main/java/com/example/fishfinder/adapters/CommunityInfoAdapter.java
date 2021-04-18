@@ -180,6 +180,7 @@ public class CommunityInfoAdapter extends ArrayAdapter<GeneralTest> {
         DatabaseReference ref= FirebaseDatabase.getInstance().getReference().child("CommunitySaves");
         //checked liked by
         //checked vetted by
+        // **BUGGED ONLY BECAUSE THIS USES LISTVIEWS INSTEAD OF RECYCLER VIEW *UNCOMMENT TO RUN AND SHOW IN CLASS WHAT THE ISSUE WAS AND WHY RECYCLER VIEW FIXES THIS
 //        ref.addValueEventListener(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -195,7 +196,7 @@ public class CommunityInfoAdapter extends ArrayAdapter<GeneralTest> {
 //                                if ( datavettedby.getValue().toString().equals(userId) ) {
 //                                    //disable since we found it in list of vetted
 //                                    btnComVet.setEnabled(false);
-////                                    btnComVet.setAlpha(0.3f);
+//                                    btnComVet.setAlpha(0.3f);
 //                                    break;
 //                                }
 //                            }
@@ -206,7 +207,7 @@ public class CommunityInfoAdapter extends ArrayAdapter<GeneralTest> {
 //                                if ( datalikedby.getValue().toString().equals(userId) ) {
 //                                    //disable since we found it in list of liked
 //                                    btnComLike.setEnabled(false);
-////                                    btnComLike.setAlpha(0.3f);
+//                                    btnComLike.setAlpha(0.3f);
 //                                    break;
 //                                }
 //                            }
@@ -220,7 +221,7 @@ public class CommunityInfoAdapter extends ArrayAdapter<GeneralTest> {
 //
 //            }
 //        });
-
+        //BUGGED END **
 
         //Finally deal with updating
         btnComVet.setOnClickListener(new View.OnClickListener() {
