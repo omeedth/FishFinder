@@ -144,6 +144,78 @@ public class MainPageActivity extends AppCompatActivity {
 
                     for(DataSnapshot datas: dataSnapshot.getChildren()){
 
+
+                        //1.0b Skip bad records that are completely missing fields, avoids app crashes
+                        if (!datas.child("userId").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("email").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("title").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("latitude").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("longitude").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("imgId").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("fishname").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("weight").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("length").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("genus").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("species").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("bait").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("bodyshape").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("usercomment").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("username").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("likes").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("vets").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+
+
                         //1.0a make our database instance to read and copy the values in our GeneralTest database
                         GeneralTest toAdd = new GeneralTest();
                         toAdd.setUserId(datas.child("userId").getValue().toString());

@@ -85,6 +85,95 @@ public class UserProfileActivity extends AppCompatActivity {
 
                         //1.0a make our database instance to read and copy the values in our GeneralTest database
                         GeneralTest toAdd = new GeneralTest();
+
+                        //1.0b Skip bad records
+                        if (!datas.child("userId").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("email").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("title").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("latitude").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("longitude").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("imgId").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("fishname").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("weight").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("length").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("genus").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("species").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("bait").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("bodyshape").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("usercomment").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("username").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("likes").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+                        if (!datas.child("vets").exists()) {
+                            //Bad record just skip
+                            continue;
+                        }
+//                        if (!datas.child("vettedby").exists()) {
+//                            //Bad record just skip
+//                            continue;
+//                        }
+//                        if (!datas.child("likedby").exists()) {
+//                            //Bad record just skip
+//                            continue;
+//                        }
+//                        if (!datas.child("comments").exists()) {
+//                            //Bad record just skip
+//                            continue;
+//                        }
+//                        if (!datas.child("commentsBy").exists()) {
+//                            //Bad record just skip
+//                            continue;
+//                        }
+
+
+                        //All records are safe. Thus continue
                         toAdd.setUserId(datas.child("userId").getValue().toString());
                         toAdd.setEmail(datas.child("email").getValue().toString());
                         toAdd.setTitle(datas.child("title").getValue().toString());
