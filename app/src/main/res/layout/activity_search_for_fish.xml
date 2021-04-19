@@ -47,6 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="283dp"
                 android:translationZ="90dp" />
+
         </FrameLayout>
 
     </LinearLayout>
@@ -109,5 +110,30 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.975"
         app:layout_constraintStart_toEndOf="@+id/tvShowLat" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/lat_long_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Switch
+            android:id="@+id/switchUSGSAPI"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="USGS Locations" />
+
+        <Switch
+            android:id="@+id/switchCommunity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Community Locations" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
