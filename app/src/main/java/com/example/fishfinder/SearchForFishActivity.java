@@ -159,10 +159,8 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
         /* Initialize Components */
         textViewSpecies = findViewById(R.id.textViewSpecies);
-        edtSearch = findViewById(R.id.edtSearch);
         switchUSGSAPI = findViewById(R.id.switchUSGSAPI);
         switchCommunity = findViewById(R.id.switchCommunity);
-        btnGoToFish = findViewById(R.id.btnGoToFish);
         map_container = findViewById(R.id.map_container);
         tvShowLat = findViewById(R.id.tvShowLat);
         tvShowLong = findViewById(R.id.tvShowLong);
@@ -217,20 +215,6 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             }
         });
 
-        btnGoToFish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (showUSGSLocations) { // TODO: Move this so that it just changes the visibility of the markers
-                    // Call NAS API (Finds Locations of Fish)
-                    Log.i("Info", "Getting coordinates from USGS API..."); // DEBUGGING
-                    String name = edtSearch.getText().toString();
-                    getCordinates(name); //This is for calling the markers on the map for each state after the initial google maps initialization.
-                }
-
-            }
-        });
-
         btnCaughtFish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -253,35 +237,6 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         service.shutdownNow();
 
         super.onBackPressed();
-    }
-
-    private void getCordinates(String str) {
-//        String[] pieces = str.trim().split(",");
-
-        //Some Default Values
-        final String DEFAULT_STATE = "MA"; // TODO: Get current State you're in
-
-        /* Clean State Input */
-        String state = FishListActivity.cleanSpeciesSearch(str);
-        if (str.length() <= 1) state = DEFAULT_STATE;
-        else {
-            state = str.trim();
-            if (state.length() >= 2) {
-                state = state.substring(0, 2).toUpperCase();
-            }
-        }
-
-        String urlString = String.format("%sspecies=%s&state=%s", APIBase, SPECIES, state);
-
-        /* Debugging */
-        Log.i("Debug", urlString);
-
-        fetch(urlString);
-//        parseCordinates(response);
-    }
-
-    private void longLatToMap(String[] cordinates) {
-
     }
 
     /**

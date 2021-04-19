@@ -24,6 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.fishfinder.FishInfoActivity;
 import com.example.fishfinder.R;
 import com.example.fishfinder.SearchForFishActivity;
+import com.example.fishfinder.ShowPublishedInfoActivity;
+import com.example.fishfinder.ShowSavedInfoActivity;
 import com.example.fishfinder.data.FishInfo;
 import com.example.fishfinder.data.GeneralTest;
 
@@ -43,6 +45,8 @@ import com.google.firebase.storage.StorageReference;
 // TODO: Consider changing to RecyclerView for performance improvement
 public class ProfileSavesAdapter extends ArrayAdapter<GeneralTest> {
 
+
+    //Basically Community Info Adapter with less functionality
     /* Variables */
     private ExecutorService service = Executors.newFixedThreadPool(1);
     private ArrayList<GeneralTest> fishInfoList = new ArrayList<>();
@@ -67,23 +71,18 @@ public class ProfileSavesAdapter extends ArrayAdapter<GeneralTest> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-//        if (fishInfoList.get(position) == null) {
-//            return;
-//        }
-        System.out.println("Inside" + position);
+
         // If there is already a View then just return it (Didn't Do Anything)
         // We only need to inflate the layout if the layout is not present (it is expensive to keep doing this)
         View row;
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) activityContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(R.layout.list_view_community_info, parent, false);
-            System.out.println("Inflating" + position);
+            row = inflater.inflate(R.layout.list_view_saved_info, parent, false);
         } else {
             row = convertView;
         }
 
 
-        System.out.println("Inside" + position);
 
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -92,11 +91,9 @@ public class ProfileSavesAdapter extends ArrayAdapter<GeneralTest> {
 
         //gs://fishfinder-8c4d5.appspot.com/UserFishImages/0.jpg format of the url
         //gs://fishfinder-8c4d5.appspot.com/UserFishImages/
-        TextView txtComDesc = (TextView) row.findViewById(R.id.txtComDesc);
-        ImageView imgComCaughtImage = (ImageView) row.findViewById(R.id.imgComCaughtImage);
-        Button btnComShowInfo = (Button) row.findViewById(R.id.btnComShowInfo);
-        Button btnComLike = (Button) row.findViewById(R.id.btnComLike);
-        Button btnComVet = (Button) row.findViewById(R.id.btnComVet);
+        TextView txtSavedDesc = (TextView) row.findViewById(R.id.txtSavedDesc);
+        ImageView imgSavedCaughtImage = (ImageView) row.findViewById(R.id.imgSavedCaughtImage);
+        Button btnSavedShowInfo = (Button) row.findViewById(R.id.btnSavedShowInfo);
 
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -104,7 +101,7 @@ public class ProfileSavesAdapter extends ArrayAdapter<GeneralTest> {
         String userId = firebaseUser.getUid().toString(); //used to check if we can set the button to disabled or not
 
         GeneralTest fishInfo = fishInfoList.get(position); //get the particular positioned item from the provided arraylist
-        txtComDesc.setText(fishInfo.getUserId()); //just have it show user id for now.
+        txtSavedDesc.setText(fishInfo.getUsername() + " " + fishInfo.getTitle()); //just have it show user id for now.
 
 
         //** Download Images into this row **
@@ -115,7 +112,22 @@ public class ProfileSavesAdapter extends ArrayAdapter<GeneralTest> {
             public void onSuccess(byte[] bytes) {
 //                downloadedBytes = bytes;
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                imgComCaughtImage.setImageBitmap(bitmap);
+                imgSavedCaughtImage.setImageBitmap(bitmap);
+            }
+        });
+
+        btnSavedShowInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent goToShowSavedInfoActivity = new Intent(v.getContext(), ShowSavedInfoActivity.class);
+                    goToShowSavedInfoActivity.putExtra("fishInfo", fishInfo);
+                    // based on item add info to intent
+                    goToShowSavedInfoActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);   // This flag is required to be added to activity for us to navigate there from this class
+                    activityContext.startActivity(goToShowSavedInfoActivity);
+                } catch (Exception e) {
+                    Log.e("Error ShowInfo", e.getLocalizedMessage());
+                }
             }
         });
 

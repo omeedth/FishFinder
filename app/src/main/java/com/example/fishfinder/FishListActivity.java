@@ -79,7 +79,6 @@ public class FishListActivity extends AppCompatActivity {
 
         /* Initializing Components */
         listViewFishInfo = (ListView) findViewById(R.id.listViewFishInfo);
-        editTextSearchFish = (EditText) findViewById(R.id.editTextSearchFish);
         progressBarFishSearch = (ProgressBar) findViewById(R.id.progressBarFishSearch);
         editTextFishNameSearch = (EditText) findViewById(R.id.editTextFishNameSearch);
         buttonSearchForFish = (Button) findViewById(R.id.buttonSearchForFish);
@@ -134,7 +133,6 @@ public class FishListActivity extends AppCompatActivity {
                 fishInfoAdapter.clear();
 
                 /* Extract Text */
-                speciesEntered = cleanSpeciesSearch(editTextSearchFish.getText().toString());
                 fishNameEntered = editTextFishNameSearch.getText().toString().trim();
 
                 /* Get Fish Info */
@@ -154,8 +152,6 @@ public class FishListActivity extends AppCompatActivity {
 
                     getFishInfoFromTo(offset, batchSize, endPoint, fishNameEntered);
 
-                } else if (speciesEntered.length() > 0) {
-                    getFishInfo(speciesEntered);
                 } else {
                     Toast.makeText(ctx, "Please Enter a value before searching!", Toast.LENGTH_SHORT).show();
                 }
@@ -197,39 +193,6 @@ public class FishListActivity extends AppCompatActivity {
         service.shutdownNow();
 
         super.onBackPressed();
-    }
-
-    /**
-     *
-     * @param inputString - The String you would like to clean
-     * @return A sanitized String (One Word, No Numbers, No Extra Whitespaces)
-     */
-    public static String cleanSpeciesSearch(String inputString) {
-
-        final String DEFAULT_VALUE = "";
-
-        /* Trim input String */
-        inputString = inputString.trim();
-
-        // Check if inputString has spaces in the words
-        String[] tokens;
-        if (inputString.length() > 0) {
-            tokens = inputString.split("\\s+");
-        } else {
-            tokens = new String[1];
-            tokens[0] = inputString;
-        }
-
-
-        /* Take the first word */
-        String cleanString = tokens[0];
-
-        /* Check if it is Number -> return DEFAULT VALUE */
-        if (cleanString.contains(".*\\d.*")) {
-            cleanString = DEFAULT_VALUE;
-        }
-
-        return cleanString;
     }
 
     /**
