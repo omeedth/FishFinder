@@ -8,61 +8,72 @@
     tools:context=".SearchForFishActivity">
 
     <EditText
-        android:id="@+id/edtSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="54dp"
+        android:id="@+id/editTextFilterByVet"
+        android:layout_width="244dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="40dp"
         android:ems="10"
-        android:hint="Enter a State! EX: MA"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/lat_long_container"
+        android:hint="Filter By Vet"
+        android:inputType="number"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.507"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewSpecies" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextFilterByVet">
+
+        <Switch
+            android:id="@+id/switchUSGSAPI"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="USGS Locations" />
+
+        <Switch
+            android:id="@+id/switchCommunity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Community Locations" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/lat_long_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="40dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:text="@string/textview"
-        app:layout_constraintBottom_toTopOf="@+id/btnGoToFish"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.593"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtSearch">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
         <FrameLayout
             android:id="@+id/map_container"
             android:layout_width="match_parent"
-            android:layout_height="350dp">
+            android:layout_height="400dp">
 
             <ProgressBar
                 android:id="@+id/progressBarLoadResults"
                 style="?android:attr/progressBarStyle"
                 android:layout_width="match_parent"
-                android:layout_height="283dp"
+                android:layout_height="350dp"
                 android:translationZ="90dp" />
 
         </FrameLayout>
 
     </LinearLayout>
 
-
-    <Button
-        android:id="@+id/btnGoToFish"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="126dp"
-        android:text="@string/go_to_fish"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lat_long_container" />
 
     <TextView
         android:id="@+id/textViewSpecies"
@@ -81,13 +92,11 @@
         android:id="@+id/btnCaughtFish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="16dp"
         android:text="@string/i_caught_the_fish"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btnGoToFish"
-        app:layout_constraintVertical_bias="0.075" />
+        app:layout_constraintTop_toBottomOf="@+id/lat_long_container" />
 
     <TextView
         android:id="@+id/tvShowLat"
@@ -96,8 +105,11 @@
         android:layout_marginStart="112dp"
         android:layout_marginBottom="24dp"
         android:hint="@string/latitude"
+        android:textColorHint="#000000"
+        android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:textAllCaps="true"/>
 
     <TextView
         android:id="@+id/tvShowLong"
@@ -106,34 +118,12 @@
         android:layout_marginEnd="112dp"
         android:layout_marginBottom="24dp"
         android:hint="@string/longitude"
+        android:textColorHint="#000000"
+        android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.975"
-        app:layout_constraintStart_toEndOf="@+id/tvShowLat" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/lat_long_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <Switch
-            android:id="@+id/switchUSGSAPI"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checked="true"
-            android:text="USGS Locations" />
-
-        <Switch
-            android:id="@+id/switchCommunity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checked="true"
-            android:text="Community Locations" />
-    </LinearLayout>
+        app:layout_constraintStart_toEndOf="@+id/tvShowLat"
+        android:textAllCaps="true" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
