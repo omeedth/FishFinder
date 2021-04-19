@@ -51,7 +51,7 @@
                 android:layout_width="2dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.3"
-                android:background="@drawable/vet_btn"
+                android:background="@drawable/check_vet_icon"
                 android:textSize="12dp" />
 
             <Button
