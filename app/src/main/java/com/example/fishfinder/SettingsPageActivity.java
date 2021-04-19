@@ -83,19 +83,19 @@ public class SettingsPageActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = pref.edit(); //change this for the app
-                Toast.makeText(getBaseContext(), "Ask to Save to Profile is on", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getBaseContext(), "Ask to Save to Profile is on", Toast.LENGTH_SHORT).show();
                 editor.putBoolean("AskSaveProfile", true);
                 isAskSaveProfile = true;
                 swtAskSaveProfile.setText("Always");
-                Toast.makeText(getBaseContext(), "Public posting are visible", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getBaseContext(), "Public posting are visible", Toast.LENGTH_SHORT).show();
                 editor.putBoolean("PostingVisibility", true);
                 isPublicPostVisible = true;
                 swtPostingVisibility.setText("Visible");
-                Toast.makeText(getBaseContext(), "Ask to Post to Community is on", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getBaseContext(), "Ask to Post to Community is on", Toast.LENGTH_SHORT).show();
                 editor.putBoolean("AskPostPublic", true);
                 isAskPostPublic = true;
                 swtAskPostPublic.setText("Always");
-                Toast.makeText(getBaseContext(), "Sync is on", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Default is turned on! Just click submit to Apply changes.", Toast.LENGTH_SHORT).show();
                 editor.putBoolean("SyncDataAuto", true);
                 isOnSyncDataAuto = true;
                 swtSyncDataAuto.setText("Yes");

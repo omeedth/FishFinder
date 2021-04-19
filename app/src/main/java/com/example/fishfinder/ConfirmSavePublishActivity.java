@@ -67,7 +67,8 @@ public class ConfirmSavePublishActivity extends AppCompatActivity {
     private int communitySaveDatabaseSize;
 
     SharedPreferences pref;
-
+    private boolean isAskPostPublic;
+    private boolean isAskSaveProfile;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,69 +86,22 @@ public class ConfirmSavePublishActivity extends AppCompatActivity {
         toAdd = new GeneralTest();
 
         pref = getSharedPreferences("UserSettings", MODE_PRIVATE);
+        isAskPostPublic = pref.getBoolean("AskPostPublic", true); //set the user ask to post publically as true by default or fetch from local
+        isAskSaveProfile = pref.getBoolean("AskSaveProfile", true); //same thing but for save.
+
 
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
-//                latitudeVal = "";
-//                longitudeVal = "";
-//                imgId = "";
-//                latitude = "";
-//                longitude = "";
-//                title = "";
-//                userId = "";
-//                email = "";
-//                fishname = "";
-//                weight = "";
-//                length = "";
-//                species = "";
-//                genus = "";
-//                bait = "";
-//                bodyshape = "";
-//                usercomment = "";
-//                username = "";
                 toAdd = new GeneralTest();
 
             } else {
                 //grab all the data values from previous activity
-//                imgId = extras.getString("imgId");
-//                latitude = extras.getString("latitude");
-//                longitude = extras.getString("longitude");
-//                title = extras.getString("title");
-//                userId = extras.getString("userId");
-//                email = extras.getString("email");
-//                fishname = extras.getString("fishname");
-//                weight = extras.getString("weight");
-//                length = extras.getString("length");
-//                species = extras.getString("species");
-//                genus = extras.getString("genus");
-//                bait = extras.getString("bait");
-//                bodyshape = extras.getString("bodyshape");
-//                usercomment = extras.getString("usercomment");
-//                username = extras.getString("username");
                 toAdd = (GeneralTest) extras.getSerializable("toAdd"); //get the object itself
-
             }
         } else {
 //            newString= (String) savedInstanceState.getSerializable("STRING_I_NEED");
         }
-
-//        GeneralTest toAdd = new GeneralTest();
-//        toAdd.setImgId(imgId);
-//        toAdd.setLatitude(latitude);
-//        toAdd.setLongitude(longitude);
-//        toAdd.setTitle(title);
-//        toAdd.setUserId(userId);
-//        toAdd.setEmail(email);
-//        toAdd.setFishname(fishname);
-//        toAdd.setWeight(weight);
-//        toAdd.setLength(length);
-//        toAdd.setSpecies(species);
-//        toAdd.setGenus(genus);
-//        toAdd.setBait(bait);
-//        toAdd.setBodyshape(bodyshape);
-//        toAdd.setUsercomment(usercomment);
-//        toAdd.setUsername(username);
 
 
         firebase.getReference("ProfileSaves").addValueEventListener(new ValueEventListener() {
@@ -182,7 +136,24 @@ public class ConfirmSavePublishActivity extends AppCompatActivity {
             }
         });
 
+        //If from preferences the user, user does wants to not have it ask to save. Just publish automatically once we enter this screen.
+        if (!isAskSaveProfile) {
+            firebase.getReference("ProfileSaves").child(String.valueOf(profileSavesDatabaseSize)).setValue(toAdd); //store the fishinfos saved object to the saved to profile directory of our firebase
+            btnConfirmSaveProfile.setEnabled(false); //make it so user cant just double submit this!!!
+        }
 
+
+        //If from preferences the user, user does wants to not have it ask to save. Just save automatically once we enter this screen.
+        if (!isAskPostPublic) {
+            firebase.getReference("CommunitySaves").child(String.valueOf(communitySaveDatabaseSize)).setValue(toAdd); //store the fishinfos saved object to the community accessible directory of our firebase
+            btnConfirmPublishCom.setEnabled(false); //make it so user cant just double submit this!!!
+        }
+
+
+
+
+
+        // ** Add listeners to the buttons
         btnSaveFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

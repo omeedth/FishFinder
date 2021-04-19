@@ -84,6 +84,8 @@ public class CaughtFishActivity extends AppCompatActivity {
     private boolean successfulUpload;
 
     SharedPreferences pref;
+    private boolean isAskPostPublic;
+    private boolean isAskSaveProfile;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,6 +107,8 @@ public class CaughtFishActivity extends AppCompatActivity {
         edtSaveLongitude = (EditText) findViewById(R.id.edtSaveLongitude);
 
         pref = getSharedPreferences("UserSettings", MODE_PRIVATE);
+        isAskPostPublic = pref.getBoolean("AskPostPublic", true); //set the user ask to post publically as true by default or fetch from local
+        isAskSaveProfile = pref.getBoolean("AskSaveProfile", true); //same thing but for save.
 
         firebase = FirebaseDatabase.getInstance(); //get the root node point of the database, this is so we can get the references based on the root node to get the desired data references
         firebaseAuth = FirebaseAuth.getInstance();
@@ -315,9 +319,21 @@ public class CaughtFishActivity extends AppCompatActivity {
 //                            goToConfirmSavePublishActivity.putExtra("bodyshape", toAdd.getBodyshape());
 //                            goToConfirmSavePublishActivity.putExtra("usercomment", toAdd.getUsercomment());
 //                            goToConfirmSavePublishActivity.putExtra("username", toAdd.getUsername());
-                            goToConfirmSavePublishActivity.putExtra("toAdd", (Serializable) toAdd); //just pass the object to the next page
 
-                            startActivity(goToConfirmSavePublishActivity);//go to Save on profile and/or publish on community page
+                            if ( !(isAskPostPublic || isAskSaveProfile) ){
+                                //If this was the user preference. I.e. both asktopost and asktosave are false, Means user wants to save and add to community page automatically.
+                                //Just throw the the data in right now
+                                firebase.getReference("ProfileSaves").child(String.valueOf(databaseSize)).setValue(toAdd);
+                                firebase.getReference("CommunitySaves").child(String.valueOf(databaseSize)).setValue(toAdd);
+
+                                //And finally just go back to the community page and skip the asking to post or save step.
+                                Intent goBackToMainPage = new Intent(v.getContext(), MainPageActivity.class);
+                                startActivity(goBackToMainPage);
+
+                            } else {
+                                goToConfirmSavePublishActivity.putExtra("toAdd", (Serializable) toAdd); //just pass the object to the next page
+                                startActivity(goToConfirmSavePublishActivity);//go to Save on profile and/or publish on community page
+                            }
                         }
                     });
 
