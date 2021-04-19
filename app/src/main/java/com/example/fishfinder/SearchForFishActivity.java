@@ -90,6 +90,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     //Components
     private TextView textViewSpecies;
     private EditText edtSearch;
+    private EditText edtTextFilterByVet;
 
     private Switch switchUSGSAPI;
     private Switch switchCommunity;
@@ -166,6 +167,8 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         tvShowLong = findViewById(R.id.tvShowLong);
         btnCaughtFish = findViewById(R.id.btnCaughtFish);
         progressBarLoadResults = (ProgressBar) findViewById(R.id.progressBarLoadResults);
+        edtTextFilterByVet = findViewById(R.id.editTextFilterByVet);
+        edtTextFilterByVet.setText("");//just init to empty string first.
 
         /* Setup */
         // Display the Name of the fish you are searching locations for
@@ -204,6 +207,12 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                 showCommunitySaves = isChecked;
 
                 if(showCommunitySaves) {
+                    //reset it and make it go through the database again. To fetch the markers and check base on the filter.
+                    communityClusterItems.clear();
+                    communityClusterManager.clearItems();
+                    addFirebaseCoordinates();
+
+                    //Add the newly parsed through set of markers that was checked based on the filter value.
                     communityClusterManager.addItems(communityClusterItems);
                     communityClusterManager.getMarkerCollection().showAll();
                     communityClusterManager.cluster();
@@ -595,10 +604,36 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                // Data is each child element in the "CommunitySaves" Database Reference now
+                                //1. Check if this data's vet value
+                                int threshHoldVetValue = 0;
+                                if (edtTextFilterByVet.getText().toString().equals("")) {
+                                    //1.1 If it is empty, means user did not input a threshhold value for vets.
+                                    //give it a 0 threshold.
+                                    threshHoldVetValue = 0;
+                                } else {
+                                    try {
+                                        //Get the value from the text box. User submitted a value.
+                                        threshHoldVetValue = Integer.parseInt(edtTextFilterByVet.getText().toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                if (data.child("vets").exists()) {
+                                    //Field exists so we can compare the values
+                                    if (! (threshHoldVetValue < Integer.parseInt(data.child("vets").getValue().toString())) ) {
+                                        continue;
+                                        //Just ignore this data value because it did not pass our user submitted threshhold.
+                                        //Will not be added to clustermanager thus will not be shown.
+                                    }
+                                }
+
+
+                                //2. Data is each child element in the "CommunitySaves" Database Reference now, Set the reference
                                 String genus = null;
                                 String species = null;
 
+                                //2.1 Grab the data
                                 try {
                                     genus = data.child("genus").getValue(String.class);
                                     species = data.child("species").getValue(String.class);
@@ -608,7 +643,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
 //                                Log.i("Info", "<COMMUNITY> Species: " + species + ", Genus: " + genus); // DEBUGGING
 
-                                // Check if the fish we are on matches the fish posted in the database
+                                //3. Check if the fish we are on matches the fish posted in the database, if so do functions to grab the information. Making sure
+                                // that there is a lat long value to display the marker off of and it is a double parsable value.
+                                //Finally adding that marker with those values in clustermanager.
                                 if (fishInfo.getGenus().equals(genus) && fishInfo.getSpecies().equals(species)) {
 
                                     Log.i("Info", "Fish Match Found On Community!"); // DEBUGGING
