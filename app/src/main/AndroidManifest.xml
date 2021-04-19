@@ -46,6 +46,7 @@
         <activity android:name=".CaughtFishActivity" />
         <activity android:name=".ConfirmSavePublishActivity" />
         <activity android:name=".ShowPublishedInfoActivity" />
+        <activity android:name=".ShowSavedInfoActivity" />
 
         <activity android:name=".LoginActivity">
             <intent-filter>

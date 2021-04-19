@@ -157,15 +157,13 @@ public class CaughtFishActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot datas: dataSnapshot.getChildren()){
                     //look for the username of the user so we can display it
-                    String theCurrentId = datas.getValue().toString();
+                    String theCurrentId = datas.getKey().toString();
                     if (theCurrentId.equals(userId)) {
                         //if the userId matches this child value we found it so set the username for the user
-                        username = datas.child(theCurrentId).getValue().toString(); //set the username for this person
+                        username = datas.child("username").getValue().toString(); //set the username for this person
                     }
                 }
-
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
