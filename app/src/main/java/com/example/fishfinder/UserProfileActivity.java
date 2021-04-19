@@ -21,6 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -34,6 +37,11 @@ public class UserProfileActivity extends AppCompatActivity {
 
     ArrayList<GeneralTest> savedInfoList;
     Context ctx;
+
+    FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
+
+
 
     private CommunityInfoAdapter savesInfoAdapter;
     //    private ComInfoAdapter comInfoAdapter;
@@ -52,6 +60,9 @@ public class UserProfileActivity extends AppCompatActivity {
         lvSavedFishes = (ListView) findViewById(R.id.lvSavedFishes);
         savedInfoList = new ArrayList<GeneralTest>();
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
+        String userId = firebaseUser.getUid().toString(); //used to check if we can set the button to disabled or not
 
         if (isOnSyncDataAuto) {
             //load the data to an arraylist if it is true then add to adapter to view.
@@ -66,6 +77,11 @@ public class UserProfileActivity extends AppCompatActivity {
                     savedInfoList = new ArrayList<GeneralTest>();
 
                     for(DataSnapshot datas: dataSnapshot.getChildren()){
+
+                        if (! datas.child("userId").getValue().toString().equals(userId)) {
+                            //If the userId does not match the record do not show it. Thus continue.
+                            continue;
+                        }
 
                         //1.0a make our database instance to read and copy the values in our GeneralTest database
                         GeneralTest toAdd = new GeneralTest();
