@@ -3,6 +3,7 @@ package com.example.fishfinder;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -61,7 +62,11 @@ public class FishListActivity extends AppCompatActivity {
     private EditText editTextFishNameSearch;
     private ProgressBar progressBarFishSearch;
     private Button buttonSearchForFish;
+    private Button buttonCantFindFish;
     private ListView listViewFishInfo;
+
+    private final float DISABLED_FLOAT = 0.3f;
+    private final int FINAL_BATCH_SIZE = 1000;
 
     // Only purpose is to run a function on a different thread, avoids thread locking on the UI
     ExecutorService service = Executors.newFixedThreadPool(1);
@@ -82,6 +87,10 @@ public class FishListActivity extends AppCompatActivity {
         progressBarFishSearch = (ProgressBar) findViewById(R.id.progressBarFishSearch);
         editTextFishNameSearch = (EditText) findViewById(R.id.editTextFishNameSearch);
         buttonSearchForFish = (Button) findViewById(R.id.buttonSearchForFish);
+        buttonCantFindFish = (Button) findViewById(R.id.buttonCantFindFish);
+
+        buttonCantFindFish.setEnabled(false);
+        buttonCantFindFish.setAlpha(DISABLED_FLOAT); //initially it cant be used because no search option
 
         /* Pre Setup */
         listViewFishInfo.setAdapter(fishInfoAdapter); // Setting the ListAdapter which will populate the ListView
@@ -120,6 +129,10 @@ public class FishListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                //enable cant find fish option.
+                buttonCantFindFish.setEnabled(true);
+                buttonCantFindFish.setAlpha(1.0f);
+
                 // TODO: Stop ExecutorService from running previous jobs when we add another job (Or switch activities)
 
                 final String DEFAULT_SPECIES = "cyanellus"; // TODO: Change the default
@@ -144,7 +157,7 @@ public class FishListActivity extends AppCompatActivity {
                     // TODO: get the number of records in FishBase by calling the API
                     int endPoint = TOTAL_FISHBASE_RECORDS;   // How many records will we try to search for (Max Value means going through all records) // 34571 HARDCODED TO MAX RESULTS RIGHT NOW
                     int offset = 0;         // Where we start searching from
-                    int batchSize = 1000;    // How many records we search per query
+                    int batchSize = FINAL_BATCH_SIZE;    // How many records we search per query
 
                     progressBarFishSearch.setProgress(0);
                     progressBarFishSearch.setMax(endPoint);
@@ -164,6 +177,50 @@ public class FishListActivity extends AppCompatActivity {
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {}
 //        });
+
+
+
+        //This is button is for letting community handle everything. Since we cant find the fish using the api.
+        buttonCantFindFish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //If enabled check if there is a string passed into search for fish.
+                fishNameEntered = editTextFishNameSearch.getText().toString().trim();
+                if (! (fishNameEntered.length() > 0) ){
+                    buttonCantFindFish.setEnabled(false);
+                    buttonCantFindFish.setAlpha(DISABLED_FLOAT);
+                    Toast.makeText(ctx, "Please Enter the fish you can't find", Toast.LENGTH_SHORT).show();
+                    //make sure user enters a value to get to the map intent that relies on the community submissions
+                } else {
+                    //make a fishinfo record that only has the FBname as the common name.
+                    FishInfo fishInfo = new FishInfo();
+                    fishInfo.setFBname(fishNameEntered);
+                    fishInfo.setBodyShapeI("");
+                    fishInfo.setComments("");
+                    fishInfo.setDangerous("");
+                    fishInfo.setFresh(true);
+                    fishInfo.setSaltwater(false);
+                    fishInfo.setImage("");
+                    fishInfo.setSpecies("");
+                    fishInfo.setGenus("");
+                    fishInfo.setLength(0.0);
+                    fishInfo.setWeight(0.0);
+
+                    try {
+                        Intent goToSearchForFishActivity = new Intent(v.getContext(), SearchForFishActivity.class);
+                        goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
+                        goToSearchForFishActivity.putExtra("isCantFind", true); //means we cant find it from the api.
+                        //based on item add info to intent
+                        startActivity(goToSearchForFishActivity);
+
+                    } catch (Exception e) {
+                        Log.e("Error", e.getLocalizedMessage());
+                    }
+
+                }
+
+            }
+        });
 
     }
 

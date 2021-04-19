@@ -144,6 +144,7 @@ public class FishInfoAdapter extends ArrayAdapter<FishInfo> {
                 try {
                     Intent goToSearchForFishActivity = new Intent(v.getContext(), SearchForFishActivity.class);
                     goToSearchForFishActivity.putExtra("fishInfo", fishInfo);
+                    goToSearchForFishActivity.putExtra("isCantFind", false); //means this was found so we can just go with it.
 
                     //based on item add info to intent
                     goToSearchForFishActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  // This flag is required to be added to activity for us to navigate there from this class

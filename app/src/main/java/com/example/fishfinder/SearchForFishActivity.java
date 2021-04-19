@@ -107,6 +107,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
     private String LatitudeClicked;
     private String LongitudeClicked;
 
+    boolean isCantFind;
 
     // TODO: Add other possible fish location APIs (Found Here: http://www.fishmap.org/technology.html)
     // 1. http://fishnet2.net/api/v1/apihelp.htm#params (Waiting for API Key)
@@ -150,9 +151,12 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                 SPECIES = DEFAULT_SPECIES;
                 GENUS = DEFAULT_GENUS;
                 fishInfo = new FishInfo();
+                isCantFind = false; //just came from found from apis.
                 Toast.makeText(ctx, "Error No Fish Info Found!", Toast.LENGTH_SHORT).show();
             } else {
                 fishInfo = (FishInfo) extras.getSerializable("fishInfo");
+                isCantFind = extras.getBoolean("isCantFind");
+
                 SPECIES = fishInfo.getSpecies();
                 GENUS = fishInfo.getGenus();
             }
