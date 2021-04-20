@@ -192,15 +192,19 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 showUSGSLocations = isChecked;
 
-                if(showUSGSLocations) {
-                    USGSAPIClusterManager.addItems(USGSAPIClusterItems);
-                    USGSAPIClusterManager.getMarkerCollection().showAll();
-                    USGSAPIClusterManager.cluster();
-                } else {
-                    USGSAPIClusterManager.getMarkerCollection().hideAll();
-                    USGSAPIClusterManager.clearItems();
-                    USGSAPIClusterManager.cluster();
+                //If it is findable use the API.
+                if (!isCantFind) {
+                    if(showUSGSLocations) {
+                        USGSAPIClusterManager.addItems(USGSAPIClusterItems);
+                        USGSAPIClusterManager.getMarkerCollection().showAll();
+                        USGSAPIClusterManager.cluster();
+                    } else {
+                        USGSAPIClusterManager.getMarkerCollection().hideAll();
+                        USGSAPIClusterManager.clearItems();
+                        USGSAPIClusterManager.cluster();
+                    }
                 }
+
             }
         });
 
@@ -384,7 +388,13 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         communityClusterRenderer = new MapsClusterItemRenderer(ctx, mMap, communityClusterManager, Color.BLUE);
         communityClusterManager.setRenderer(communityClusterRenderer);
 
-        setUpUSGSClusterer();
+        if (!isCantFind) {
+            setUpUSGSClusterer();
+        }
+        if (isCantFind) {
+            progressBarLoadResults.setVisibility(View.GONE);
+        }
+
         setUpCommunityClusterer();
 
         /* Save Latitude and Longitude when clicking on the map */
@@ -437,7 +447,6 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
         USGSAPIClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MapsClusterItem>() {
             @Override
             public boolean onClusterItemClick(MapsClusterItem item) {
-
                 String lat = String.valueOf(item.getPosition().latitude);
                 String lng = String.valueOf(item.getPosition().longitude);
                 Toast.makeText(SearchForFishActivity.this, "Location:" + lat + lng, Toast.LENGTH_SHORT).show();
@@ -634,8 +643,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
 
                                 //2. Data is each child element in the "CommunitySaves" Database Reference now, Set the reference
-                                String genus = null;
-                                String species = null;
+                                String genus = "";
+                                String species = "";
+                                String fishFBname = "";
 
                                 //2.1 Grab the data
                                 try {
@@ -645,13 +655,25 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                                     Log.e("Error", "Could not get genus or species");
                                 }
 
+                                if (data.child("fishname").exists()) {
+                                    Toast.makeText(getBaseContext(), "Exists fishname" + data.child("fishname").getValue().toString().toLowerCase(), Toast.LENGTH_SHORT).show();
+                                    fishFBname = data.child("fishname").getValue().toString().toLowerCase();
+                                }
+
 //                                Log.i("Info", "<COMMUNITY> Species: " + species + ", Genus: " + genus); // DEBUGGING
 
                                 //3. Check if the fish we are on matches the fish posted in the database, if so do functions to grab the information. Making sure
                                 // that there is a lat long value to display the marker off of and it is a double parsable value.
                                 //Finally adding that marker with those values in clustermanager.
-                                if (fishInfo.getGenus().equals(genus) && fishInfo.getSpecies().equals(species)) {
 
+
+//                                if (species.equals("") || genus.equals("")) {
+//                                    //do nothing
+//                                    //this was an empty result so do nothng
+//                                    continue;
+//                                }
+
+                                if (fishInfo.getGenus().equals(genus) && fishInfo.getSpecies().equals(species) && (!genus.equals("") && !species.equals(""))) {
                                     Log.i("Info", "Fish Match Found On Community!"); // DEBUGGING
 
                                     LatLng communityCoords = null;
@@ -683,7 +705,37 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                                     } catch(Exception e) {
                                         Log.e("Error", "Could not get Latitude or Longitude! Latitude: " + data.child("latitude").getValue(String.class) + ", Longitude: " + data.child("longitude").getValue(String.class));
                                     }
+                                }
 
+                                //Check for matches in FBname for database check. A very soft general check.
+                                else if (fishFBname.contains(fishInfo.getFBname().toLowerCase()) || fishInfo.getFBname().toLowerCase().contains(fishFBname)) {
+                                    Log.i("Info", "Fish Match Found On Community!"); // DEBUGGING
+                                    LatLng communityCoords = null;
+                                    double latitude;
+                                    double longitude;
+
+                                    try {
+                                        latitude = Double.parseDouble(data.child("latitude").getValue(String.class));
+                                        longitude = Double.parseDouble(data.child("longitude").getValue(String.class));
+                                        lastAddedMarkerLocation = new LatLng(latitude, longitude);
+                                        communityCoords = new LatLng(latitude, longitude);
+
+                                        /* Cluster Markers */
+                                        String title = "Community Catch!";
+                                        String snippet = "";
+                                        MapsClusterItem offsetItem = new MapsClusterItem(latitude, longitude, title, snippet);
+                                        communityClusterManager.addItem(offsetItem);
+                                        communityClusterItems.add(offsetItem);
+                                    } catch(Exception e) {
+                                        Log.e("Error", "Could not get Latitude or Longitude! Latitude: " + data.child("latitude").getValue(String.class) + ", Longitude: " + data.child("longitude").getValue(String.class));
+                                    }
+                                }
+
+                                else {
+                                    //do nothing
+                                    Toast.makeText(getBaseContext(), "Skipping ", Toast.LENGTH_SHORT).show();
+//                                    System.out.println("Continueing skipping");
+                                    continue;
                                 }
 
                             }
