@@ -656,7 +656,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                                 }
 
                                 if (data.child("fishname").exists()) {
-                                    Toast.makeText(getBaseContext(), "Exists fishname" + data.child("fishname").getValue().toString().toLowerCase(), Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(getBaseContext(), "Exists fishname" + data.child("fishname").getValue().toString().toLowerCase(), Toast.LENGTH_SHORT).show();
                                     fishFBname = data.child("fishname").getValue().toString().toLowerCase();
                                 }
 
