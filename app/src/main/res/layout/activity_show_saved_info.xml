@@ -41,7 +41,7 @@
                 android:id="@+id/TvCatchTitleSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Catch Title:"
+                android:text="@string/catch_title4"
                 android:textColor="#2196F3"
                 android:textSize="24sp" />
 
@@ -49,7 +49,7 @@
                 android:id="@+id/tvCatchTitleInfoSave"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="TextView"
+                android:text=""
                 android:textSize="24sp" />
 
         </TableRow>
@@ -63,7 +63,7 @@
                 android:id="@+id/tvUserSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="User:"
+                android:text="@string/user"
                 android:textColor="#2196F3"
                 android:textSize="24sp" />
 
@@ -71,7 +71,7 @@
                 android:id="@+id/tvUserInfoSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textSize="24sp" />
         </TableRow>
 
@@ -85,7 +85,7 @@
                 android:id="@+id/tvFishNameSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fish Name:"
+                android:text="@string/fish_name4"
                 android:textColor="#2196F3"
                 android:textSize="24sp" />
 
@@ -93,7 +93,7 @@
                 android:id="@+id/tvFishNameInfoSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textSize="24sp" />
         </TableRow>
 
@@ -106,7 +106,7 @@
                 android:id="@+id/tvLocationSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Location:"
+                android:text="@string/location"
                 android:textColor="#2196F3"
                 android:textSize="24sp" />
 
@@ -114,7 +114,7 @@
                 android:id="@+id/tvLocationInfoSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textSize="24sp" />
         </TableRow>
 
@@ -127,7 +127,7 @@
                 android:id="@+id/tvLikesSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Likes:"
+                android:text="@string/likes4"
                 android:textColor="#2196F3"
                 android:textSize="24sp" />
 
@@ -135,7 +135,7 @@
                 android:id="@+id/tvLikesInfoSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textSize="24sp" />
         </TableRow>
 
@@ -148,7 +148,7 @@
                 android:id="@+id/tvVetsSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Vets"
+                android:text="@string/vets4"
                 android:textColor="#2196F3"
                 android:textSize="24sp" />
 
@@ -156,7 +156,7 @@
                 android:id="@+id/tvVetsInfoSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textSize="24sp" />
         </TableRow>
 
@@ -170,7 +170,7 @@
                 android:id="@+id/tvCommentsTitleSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Comments:"
+                android:text="@string/comments"
                 android:textColor="#2196F3"
                 android:textSize="24sp" />
         </TableRow>

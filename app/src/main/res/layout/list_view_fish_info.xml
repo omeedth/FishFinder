@@ -17,7 +17,7 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Demo"
+        android:text="@string/demo"
         android:textAlignment="center"
         android:textColor="#000"
         android:textSize="16sp" />

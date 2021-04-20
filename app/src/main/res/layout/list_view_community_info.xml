@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="0.25"
-        android:text="Demo"
+        android:text="@string/demo"
         android:textAlignment="center"
         android:textColor="#000"
         android:textSize="10dp" />

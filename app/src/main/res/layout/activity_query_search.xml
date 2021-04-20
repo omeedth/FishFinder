@@ -12,13 +12,14 @@
             android:id="@+id/edtSearchQueryFish"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Fish To Query"/>
+            android:hint="@string/enter_fish_to_query"
+            android:inputType="text" />
 
         <Button
             android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Search!" />
+            android:text="@string/search3" />
 
         <Space
             android:layout_width="match_parent"
@@ -28,13 +29,14 @@
             android:id="@+id/edtSearchQueryAdvanced"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Advanced Search: bait, lat:long, weather, etc" />
+            android:hint="@string/advanced_search_bait_lat_long_weather_etc"
+            android:importantForAutofill="no" />
 
         <Button
             android:id="@+id/button2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Advanced Search!" />
+            android:text="@string/advanced_search" />
 
         <ListView
             android:id="@+id/lvQueryInfos"

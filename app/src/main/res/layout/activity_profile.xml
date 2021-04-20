@@ -31,7 +31,7 @@
                 android:id="@+id/txtProfileName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Profile Username" />
+                android:hint="@string/profile_username" />
 
             <Space
                 android:layout_width="match_parent"
@@ -41,7 +41,7 @@
                 android:id="@+id/txtProfileEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Profile Email" />
+                android:hint="@string/profile_email" />
 
             <Space
                 android:layout_width="match_parent"
@@ -51,7 +51,7 @@
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Saved Captured Fish Moments!" />
+                android:text="@string/saved_captured_fish_moments" />
 
             <ListView
                 android:id="@+id/lvSavedFishes"
@@ -68,7 +68,7 @@
                 android:id="@+id/textView9"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Other Profile Statistics..." />
+                android:hint="@string/other_profile_statistics" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -42,7 +42,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="Common Name:"
+                android:text="@string/common_name"
                 android:textColor="#2196F3"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -65,7 +65,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Species:"
+                android:text="@string/species2"
                 android:textColor="#2196F3"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -88,7 +88,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Genus:"
+                android:text="@string/genus2"
                 android:textColor="#2196F3"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -111,7 +111,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Body Shape:"
+                android:text="@string/body_shape2"
                 android:textColor="#2196F3"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -135,7 +135,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Length:"
+                android:text="@string/length2"
                 android:textColor="#2196F3"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -144,7 +144,7 @@
                 android:id="@+id/textViewLengthInfo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:textSize="24sp" />
 
@@ -159,7 +159,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Weight:"
+                android:text="@string/weight2"
                 android:textColor="#2196F3"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -182,7 +182,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Dangerous:"
+                android:text="@string/dangerous2"
                 android:textColor="#2196F3"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -205,7 +205,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Water Type:"
+                android:text="@string/water_type"
                 android:textColor="#2196F3"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -228,7 +228,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Comments:"
+                android:text="@string/comments2"
                 android:textColor="#2196F3"
                 android:textSize="24sp"
                 android:textStyle="bold" />
