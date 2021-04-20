@@ -5,13 +5,189 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="141dp"
-        android:text="TextView"
+
+    <TableLayout
+        android:id="@+id/tableLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <TableRow
+            android:id="@+id/trPictureSave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/imgUserCatchSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="77dp"
+                android:layout_marginBottom="28dp"
+                tools:srcCompat="@tools:sample/avatars" />
+        </TableRow>
+
+
+
+        <TableRow
+            android:id="@+id/trCatchTitleSave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/TvCatchTitleSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Catch Title:"
+                android:textColor="#2196F3"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvCatchTitleInfoSave"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="TextView"
+                android:textSize="24sp" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/trUserSave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvUserSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="User:"
+                android:textColor="#2196F3"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvUserInfoSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="24sp" />
+        </TableRow>
+
+
+        <TableRow
+            android:id="@+id/trFishNameSave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvFishNameSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fish Name:"
+                android:textColor="#2196F3"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvFishNameInfoSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="24sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/trLocationSave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvLocationSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location:"
+                android:textColor="#2196F3"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvLocationInfoSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="24sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/trLikesSave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvLikesSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Likes:"
+                android:textColor="#2196F3"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvLikesInfoSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="24sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/trVetsSave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvVetsSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vets"
+                android:textColor="#2196F3"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvVetsInfoSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="24sp" />
+        </TableRow>
+
+
+        <TableRow
+            android:id="@+id/trCommentsTitleSave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvCommentsTitleSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comments:"
+                android:textColor="#2196F3"
+                android:textSize="24sp" />
+        </TableRow>
+
+
+        <TableRow
+            android:id="@+id/trCommentsSave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ListView
+                android:id="@+id/lvCommentsSave"
+                android:layout_width="match_parent"
+                android:layout_height="185dp" />
+        </TableRow>
+
+    </TableLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

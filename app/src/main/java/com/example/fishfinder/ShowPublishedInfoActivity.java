@@ -38,18 +38,18 @@ import java.util.ArrayList;
 //The listview's way to show information from each of their row
 public class ShowPublishedInfoActivity extends AppCompatActivity {
 
-    TextView tvCatchTitleInfo;
-    TextView tvUserInfo;
-    TextView tvFishNameInfo;
-    TextView tvLocationInfo;
-    TextView tvLikesInfo;
-    TextView textViewCommentsInfo;
-    TextView tvVetsInfo;
-    ImageView imgUserCatch;
-    ListView lvComments;
+    private TextView tvCatchTitleInfo;
+    private TextView tvUserInfo;
+    private TextView tvFishNameInfo;
+    private TextView tvLocationInfo;
+    private TextView tvLikesInfo;
+    private TextView textViewCommentsInfo;
+    private TextView tvVetsInfo;
+    private ImageView imgUserCatch;
+    private ListView lvComments;
 
-    Button btnInfoAddAComment;
-    EditText edtAddAComment;
+    private Button btnInfoAddAComment;
+    private EditText edtAddAComment;
 
 
     final long ONE_MEGABYTE = 1024 * 1024;
@@ -60,10 +60,11 @@ public class ShowPublishedInfoActivity extends AppCompatActivity {
 
     int theCurrentCommentSize;
     boolean fromClick;
+    boolean fromClick2;
 
 //    String username;
-    String listTheComment;
-    Context ctx;
+    private String listTheComment;
+    private Context ctx;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -106,15 +107,22 @@ public class ShowPublishedInfoActivity extends AppCompatActivity {
 
         //format location information
         DecimalFormat locationDF = new DecimalFormat("#.#####");
-        String latFormatted = locationDF.format(Double.parseDouble(fishinfo.getLatitude().toString()));
-        String lonFormatted = locationDF.format(Double.parseDouble(fishinfo.getLongitude().toString()));
+
+        String latFormatted = "";
+        String lonFormatted = "";
+        if (! fishinfo.getLatitude().toString().isEmpty()) {
+            latFormatted = locationDF.format(Double.parseDouble(fishinfo.getLatitude().toString()));
+        }
+        if (! fishinfo.getLongitude().toString().isEmpty()) {
+            lonFormatted = locationDF.format(Double.parseDouble(fishinfo.getLongitude().toString()));
+        }
 
 
         tvCatchTitleInfo.setText(fishinfo.getTitle());
         tvFishNameInfo.setText(fishinfo.getFishname());
         tvLikesInfo.setText("" + fishinfo.getLikes());
         tvUserInfo.setText(fishinfo.getUsername());
-        tvLocationInfo.setText("lat: " + latFormatted + "long:" + lonFormatted);
+        tvLocationInfo.setText(" " + latFormatted + " , " + lonFormatted);
         tvVetsInfo.setText("" + fishinfo.getVets());
 
 
@@ -186,15 +194,15 @@ public class ShowPublishedInfoActivity extends AppCompatActivity {
                 String theCommentToAdd = edtAddAComment.getText().toString();
                 String userId = firebaseUser.getUid().toString(); //add this to firebase
                 fromClick = true;
+                fromClick2 = true;
                 String theRecordToMatch = fishinfo.getImgId();
                 DatabaseReference ref= FirebaseDatabase.getInstance().getReference().child("CommunitySaves");
                 DatabaseReference profilesaveref = FirebaseDatabase.getInstance().getReference().child("ProfileSaves");
 
                 //Add the comment to the community firebase data instance if exists. We find this with unique identifer of the img id.
                 //Since img id from this app is set up to be globally unique in firebase and identifies the record.
-                int ranonce = 0;
 
-                Log.e("Error", "inside onClick");
+//                Log.e("Error", "inside onClick");
                 ref.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -301,11 +309,7 @@ public class ShowPublishedInfoActivity extends AppCompatActivity {
                                         }
                                     });
 
-//                                    theCommentsToShowInner.add(listTheComment);
                                 }
-                                //Finish by adding it to the arrayadapter and to listview.
-//                                ArrayAdapter<String> commentsAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, theCommentsToShowInner);
-//                                lvComments.setAdapter(commentsAdapter);
                             } else {
                                 //Other wise something is wrong.
                                 //Dont show any comments, it will break the app.
@@ -322,9 +326,87 @@ public class ShowPublishedInfoActivity extends AppCompatActivity {
                     }
                 });
 
-                ranonce = 1;
-                //Add the comment to the profile firebase data instance
-//                fromClick = false;
+                //The save to profile version of the above code
+                profilesaveref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String theRecordToMatch = fishinfo.getImgId();
+                        for(DataSnapshot datas: dataSnapshot.getChildren()){
+                            if (!fromClick2) {
+                                //if this change was from click the add it else dont.
+                                Log.e("Error", "Stopped onclick false");
+                                break;
+                            }
+                            //1. Check for malformed records that will break the app
+                            if (! datas.child("imgId").exists()) {
+//                                Log.e("Error", "Stopped imgId");
+                                continue;
+                            }
+
+                            if (! theRecordToMatch.equals(datas.child("imgId").getValue().toString()) ) {
+                                //1.1 if the record img id does not match ignore this data and continue
+//                                Log.e("Error", "RecordCheck");
+                                continue;
+                            }
+
+                            if (! datas.child("username").exists()) {
+//                                Log.e("Error", "username check");
+                                continue;
+                            }
+
+                            if (! datas.child("comments").exists()) {
+//                                Log.e("Error", "comments check");
+                                continue;
+                            }
+                            if (! datas.child("commentsBy").exists()) {
+//                                Log.e("Error", "commentsBy check");
+                                continue;
+                            }
+//                            Log.e("Error", "Stopped after all the checks");
+                            //no duplicate comments
+
+                            ArrayList comments = new ArrayList();
+                            ArrayList commentsBy = new ArrayList();
+
+                            String theRecord = datas.getKey().toString();
+
+                            String lastComment = "";
+                            String lastCommentBy = "";
+                            //2. This imgId matches the right record we are looking in comments for
+                            //Now we will add to comments and commentsBy
+                            //comments and commentedBy are parallel arrays. i.e. comment by user[0] is the comment user[0] made
+                            if (datas.child("comments").getChildrenCount() != 0) {
+                                for (DataSnapshot datacomments : datas.child("comments").getChildren()) {
+                                    comments.add(datacomments.getValue().toString());
+                                    lastComment = datacomments.getValue().toString();
+                                }
+                            }
+                            if (datas.child("commentsBy").getChildrenCount() != 0) {
+                                for (DataSnapshot datacommentedby : datas.child("commentsBy").getChildren()) {
+                                    commentsBy.add(datacommentedby.getValue().toString());   //if exists add to commentsBy list
+                                    lastCommentBy = datacommentedby.getValue().toString();
+                                }
+                            }
+
+                            //Prep to add to firebase field
+                            comments.add(theCommentToAdd);
+                            commentsBy.add(userId); //add this to the array list
+
+                            //Set this comments field and comments by field to new child base on this new field
+                            profilesaveref.child(theRecord).child("comments").setValue(comments);
+                            profilesaveref.child(theRecord).child("commentsBy").setValue(commentsBy);
+
+
+                            fromClick2 = false;
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 
