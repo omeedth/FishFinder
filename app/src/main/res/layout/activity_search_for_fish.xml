@@ -35,6 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
+            android:textAlignment="center"
             android:text="USGS Locations" />
 
         <Switch
@@ -43,6 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
+            android:textAlignment="center"
             android:text="Community Locations" />
 
     </LinearLayout>
