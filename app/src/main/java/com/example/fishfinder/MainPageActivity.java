@@ -36,7 +36,6 @@ public class MainPageActivity extends AppCompatActivity {
 
     //Components
     private Button btnSearchFish;
-    private TextView tvMainPage;
     private Button btnGoToProfile;
     private ListView lvCommunity;
     private Button btnLogout;
@@ -67,7 +66,6 @@ public class MainPageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_page);
 
         btnSearchFish = (Button) findViewById(R.id.btnSearchFish);
-        tvMainPage = (TextView) findViewById(R.id.tvMainPage);
         btnGoToProfile = (Button) findViewById(R.id.btnGoToProfile);
         lvCommunity = (ListView) findViewById(R.id.lvCommunity);
         btnLogout = (Button) findViewById(R.id.btnLogout);

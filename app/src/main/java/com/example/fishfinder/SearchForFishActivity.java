@@ -221,9 +221,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                     addFirebaseCoordinates();
 
                     //Add the newly parsed through set of markers that was checked based on the filter value.
-//                    communityClusterManager.addItems(communityClusterItems);
-//                    communityClusterManager.getMarkerCollection().showAll();
-//                    communityClusterManager.cluster();
+                    communityClusterManager.addItems(communityClusterItems);
+                    communityClusterManager.getMarkerCollection().showAll();
+                    communityClusterManager.cluster();
                 } else {
                     communityClusterManager.getMarkerCollection().hideAll();
                     communityClusterManager.clearItems();
@@ -406,7 +406,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                 String lat = String.valueOf(latLng.latitude);
                 String lng = String.valueOf(latLng.longitude);
 
-                Toast.makeText(SearchForFishActivity.this, "Location:" + latLng.latitude + latLng.longitude, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(SearchForFishActivity.this, "Location:" + latLng.latitude + latLng.longitude, Toast.LENGTH_SHORT).show();
 
                 LatitudeClicked = lat; //update what we clicked so we can pass into next screen intent if that is the case final destination clicked
                 LongitudeClicked = lng;
@@ -470,7 +470,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
                 String lat = String.valueOf(item.getPosition().latitude);
                 String lng = String.valueOf(item.getPosition().longitude);
-                Toast.makeText(SearchForFishActivity.this, "Location:" + lat + lng, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(SearchForFishActivity.this, "Location:" + lat + lng, Toast.LENGTH_SHORT).show();
 
                 LatitudeClicked = lat; //update what we clicked so we can pass into next screen intent if that is the case final destination clicked
                 LongitudeClicked = lng;
@@ -733,7 +733,7 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
 
                                 else {
                                     //do nothing
-                                    Toast.makeText(getBaseContext(), "Skipping ", Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(getBaseContext(), "Skipping ", Toast.LENGTH_SHORT).show();
 //                                    System.out.println("Continueing skipping");
                                     continue;
                                 }
@@ -744,9 +744,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    communityClusterManager.addItems(communityClusterItems);
-                                    communityClusterManager.getMarkerCollection().showAll();
-                                    communityClusterManager.cluster();
+//                                    communityClusterManager.addItems(communityClusterItems);
+//                                    communityClusterManager.getMarkerCollection().showAll();
+//                                    communityClusterManager.cluster();
                                 }
                             });
 

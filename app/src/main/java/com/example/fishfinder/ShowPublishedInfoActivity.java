@@ -159,7 +159,7 @@ public class ShowPublishedInfoActivity extends AppCompatActivity {
                 usernameref.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        String userId = firebaseUser.getUid().toString();
+                        String userId = theCommentAuthor;
                         for(DataSnapshot datas: dataSnapshot.getChildren()){
                             if (datas.getKey().toString().equals(userId)) {
                                 //found the userid's for the users record.
@@ -290,7 +290,7 @@ public class ShowPublishedInfoActivity extends AppCompatActivity {
                                     usernameref.addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            String userId = firebaseUser.getUid().toString();
+                                            String userId = theCommentAuthor;
                                             for(DataSnapshot datas2: dataSnapshot.getChildren()){
                                                 if (datas2.getKey().toString().equals(userId)) {
                                                     //found the userid's for the users record.
