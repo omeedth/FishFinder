@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -408,4 +410,31 @@ public class CaughtFishActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         return;
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.simple_menu_nosync, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+        if (id == R.id.mnu_zero) { //replacing given menu code with new ones
+            Toast.makeText(getBaseContext(), "Settings", Toast.LENGTH_LONG).show();
+            Intent goToSettings = new Intent(getBaseContext(), SettingsPageActivity.class);
+            startActivity(goToSettings);
+        }
+
+        if (id == R.id.mnu_one) {
+            //Go home page/main page.
+            Intent goHomePage = new Intent(getBaseContext(), MainPageActivity.class);
+            startActivity(goHomePage);
+//            Toast.makeText(getBaseContext(), "Welcome Home", Toast.LENGTH_LONG).show();
+        }
+
+        return true;
+    }
+
 }

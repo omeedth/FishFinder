@@ -38,6 +38,10 @@ public class UserProfileActivity extends AppCompatActivity {
 
     ListView lvSavedFishes;
 
+
+    TextView txtProfileName;
+    TextView txtProfileEmail;
+
     ArrayList<GeneralTest> savedInfoList;
     Context ctx;
 
@@ -61,12 +65,41 @@ public class UserProfileActivity extends AppCompatActivity {
 
         //init views
         lvSavedFishes = (ListView) findViewById(R.id.lvSavedFishes);
+        txtProfileName = (TextView) findViewById(R.id.txtProfileName);
+        txtProfileEmail = (TextView) findViewById(R.id.txtProfileEmail);
         savedInfoList = new ArrayList<GeneralTest>();
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser(); //get the current user based on the auth
         String userId = firebaseUser.getUid().toString(); //used to check if we can set the button to disabled or not
 
+        DatabaseReference userref =  FirebaseDatabase.getInstance().getReference().child("Users");
+        //look for the user record for this user
+        userref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot datas: dataSnapshot.getChildren()){
+                    if (datas.getKey().toString().equals(userId)) {
+                        //if we found the user record
+                        //Set the views base on the record and the record fields we found
+                        if(datas.child("username").exists()) {
+                            txtProfileName.setText(datas.child("username").getValue().toString());
+                        }
+                        if (datas.child("email").exists()) {
+                            txtProfileEmail.setText(datas.child("email").getValue().toString());
+                        }
+                    }
+                }
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+        //Looks for if our settings tell us to sync automatically or not. If so go and set the listview up automatically.
         if (isOnSyncDataAuto) {
             //load the data to an arraylist if it is true then add to adapter to view.
             savedInfoList = new ArrayList<GeneralTest>();

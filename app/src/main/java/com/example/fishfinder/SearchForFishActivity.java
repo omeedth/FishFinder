@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -23,7 +25,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.fishfinder.adapters.ProfileSavesAdapter;
 import com.example.fishfinder.data.FishInfo;
+import com.example.fishfinder.data.GeneralTest;
 import com.example.fishfinder.data.MapsClusterItem;
 import com.example.fishfinder.data.MapsClusterItemRenderer;
 import com.example.fishfinder.util.RestAPIUtil;
@@ -762,6 +766,33 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
             }
         });
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.simple_menu_nosync, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+        if (id == R.id.mnu_zero) { //replacing given menu code with new ones
+            Toast.makeText(getBaseContext(), "Settings", Toast.LENGTH_LONG).show();
+            Intent goToSettings = new Intent(getBaseContext(), SettingsPageActivity.class);
+            startActivity(goToSettings);
+        }
+
+        if (id == R.id.mnu_one) {
+            //Go home page/main page.
+            Intent goHomePage = new Intent(getBaseContext(), MainPageActivity.class);
+            startActivity(goHomePage);
+//            Toast.makeText(getBaseContext(), "Welcome Home", Toast.LENGTH_LONG).show();
+        }
+
+        return true;
     }
 
 }
