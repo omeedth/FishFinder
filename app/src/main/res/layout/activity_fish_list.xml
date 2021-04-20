@@ -21,11 +21,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:text="Search For Fish"
+        android:text="@string/search_for_fish2"
         app:layout_constraintBottom_toTopOf="@+id/listViewFishInfo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.994" />
 
     <EditText
         android:id="@+id/editTextFishNameSearch"
@@ -33,34 +35,34 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:ems="10"
-        android:hint="Fish Name"
+        android:hint="@string/fish_name2"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:autofillHints="" />
 
     <ProgressBar
         android:id="@+id/progressBarFishSearch"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="198dp"
         android:layout_height="35dp"
+        android:layout_marginTop="96dp"
         android:background="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSearchForFish"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextFishNameSearch"
-        app:layout_constraintVertical_bias="0.306" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonCantFindFish"
-        android:layout_width="151dp"
-        android:layout_height="30dp"
+        android:layout_width="171dp"
+        android:layout_height="33dp"
         android:layout_marginTop="148dp"
-        android:text="Cant Find Fish?"
-        android:textSize="10sp"
         android:backgroundTint="@color/teal_700"
+        android:text="@string/cant_find_fish"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

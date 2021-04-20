@@ -57,4 +57,7 @@
     <string name="sync_data_automatically">Sync data automatically?</string>
     <string name="ask_to_post_publicly">Ask to post publicly?</string>
     <string name="visible">Visible</string>
+    <string name="search_for_fish2">Search For Fish</string>
+    <string name="fish_name2">Fish Name</string>
+    <string name="cant_find_fish">Cant Find Fish?</string>
 </resources>
