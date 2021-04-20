@@ -60,4 +60,6 @@
     <string name="search_for_fish2">Search For Fish</string>
     <string name="fish_name2">Fish Name</string>
     <string name="cant_find_fish">Cant Find Fish?</string>
+    <string name="add_a_comment">Add a Comment</string>
+    <string name="add_comment">Add Comment</string>
 </resources>
