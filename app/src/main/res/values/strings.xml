@@ -57,4 +57,5 @@
     <string name="sync_data_automatically">Sync data automatically?</string>
     <string name="ask_to_post_publicly">Ask to post publicly?</string>
     <string name="visible">Visible</string>
+    <string name="color_blue_200">2c70cf</string>
 </resources>
