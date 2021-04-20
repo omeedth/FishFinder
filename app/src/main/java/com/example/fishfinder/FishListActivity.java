@@ -39,6 +39,8 @@ public class FishListActivity extends AppCompatActivity {
     private String fishNameEntered = "";    // Will save the String of the Fish Name you enter inside the EditText
     private Context ctx;                    // Saves the Context of this Activity so that we may use it later within anonymous functions with no context
     private FishInfoAdapter fishInfoAdapter;
+    private ArrayList<FishInfo> fishbaseFishInfo; // All of the fish in the database
+    private boolean loadedFishBase;
 
     // FishBase API Endpoints
     private final String    FishBaseAPIBase = "https://fishbase.ropensci.org/";
@@ -76,11 +78,13 @@ public class FishListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fish_list);
 
-//        Log.i("Info", "OnCreate!"); // DEBUGGING
+        Log.i("OnCreate", "FishListActivity OnCreate!"); // DEBUGGING
 
         /* Initialize Variables */
         ctx = this.getBaseContext();
         fishInfoAdapter = new FishInfoAdapter(ctx, R.layout.list_view_fish_info, new ArrayList<FishInfo>()); // , service
+        fishbaseFishInfo = new ArrayList<>();
+        loadedFishBase = false;
 
         /* Initializing Components */
         listViewFishInfo = (ListView) findViewById(R.id.listViewFishInfo);
@@ -148,22 +152,28 @@ public class FishListActivity extends AppCompatActivity {
                 /* Extract Text */
                 fishNameEntered = editTextFishNameSearch.getText().toString().trim();
 
-                /* Get Fish Info */
-                if (speciesEntered.equals("")) speciesEntered = DEFAULT_SPECIES;
-
                 // If fish Name is entered then search by Fish Name
                 if (fishNameEntered.length() > 0) {
 
-                    // TODO: get the number of records in FishBase by calling the API
-                    int endPoint = TOTAL_FISHBASE_RECORDS;   // How many records will we try to search for (Max Value means going through all records) // 34571 HARDCODED TO MAX RESULTS RIGHT NOW
-                    int offset = 0;         // Where we start searching from
-                    int batchSize = FINAL_BATCH_SIZE;    // How many records we search per query
+                    if (loadedFishBase) {
+                        // TODO: Load from arraylist
+                        Log.i("Info", "Using preloaded arraylist!");
+                        addFishToListAdapter(getFishNameContains(fishNameEntered));
+                    } else {
 
-                    progressBarFishSearch.setProgress(0);
-                    progressBarFishSearch.setMax(endPoint);
-                    progressBarFishSearch.setVisibility(View.VISIBLE);
+                        fishbaseFishInfo.clear();
+                        loadedFishBase = false;
 
-                    getFishInfoFromTo(offset, batchSize, endPoint, fishNameEntered);
+                        int endPoint = TOTAL_FISHBASE_RECORDS;   // How many records will we try to search for (Max Value means going through all records) // 34571 HARDCODED TO MAX RESULTS RIGHT NOW
+                        int offset = 0;         // Where we start searching from
+                        int batchSize = FINAL_BATCH_SIZE;    // How many records we search per query
+
+                        progressBarFishSearch.setProgress(0);
+                        progressBarFishSearch.setMax(endPoint);
+                        progressBarFishSearch.setVisibility(View.VISIBLE);
+
+                        getFishInfoFromTo(offset, batchSize, endPoint, fishNameEntered);
+                    }
 
                 } else {
                     Toast.makeText(ctx, "Please Enter a value before searching!", Toast.LENGTH_SHORT).show();
@@ -425,6 +435,7 @@ public class FishListActivity extends AppCompatActivity {
                         /* Send GET Request to obtain data from URL, and parse as JSON */
                         String content = RestAPIUtil.get(completeAPICall);
                         ArrayList<FishInfo> fishInfoFromAPI = parseFishInfo(content);
+                        fishbaseFishInfo.addAll(fishInfoFromAPI);
                         ArrayList<FishInfo> filteredFishInfo = new ArrayList<>();
 
                         // Check to see if name contains the string, and add it to the list if so
@@ -451,6 +462,8 @@ public class FishListActivity extends AppCompatActivity {
 
                                 /* Remove Progress Bar if fully loaded */
                                 if (progressBarFishSearch.getProgress() >= progressBarFishSearch.getMax()) {
+                                    Toast.makeText(ctx, "Cached all fish!", Toast.LENGTH_SHORT).show();
+                                    loadedFishBase = true;
                                     progressBarFishSearch.setVisibility(View.GONE);
                                 }
 
@@ -480,6 +493,22 @@ public class FishListActivity extends AppCompatActivity {
 
         return fishinfoList;
 
+    }
+
+    private void addFishToListAdapter(ArrayList<FishInfo> fishinfolist) {
+        if (fishinfolist.size() > 0) {
+            fishInfoAdapter.addAll(fishinfolist);
+            fishInfoAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private ArrayList<FishInfo> getFishNameContains(String name) {
+        ArrayList<FishInfo> filteredFishInfo = new ArrayList<>();
+        String lowerCaseNameRegex = name.toLowerCase();
+        for (FishInfo fishInfo : fishbaseFishInfo) {
+            if (fishInfo.getFBname().toLowerCase().contains(lowerCaseNameRegex)) filteredFishInfo.add(fishInfo);
+        }
+        return filteredFishInfo;
     }
 
     /**
