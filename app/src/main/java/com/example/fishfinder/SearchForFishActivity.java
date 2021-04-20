@@ -221,9 +221,9 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                     addFirebaseCoordinates();
 
                     //Add the newly parsed through set of markers that was checked based on the filter value.
-                    communityClusterManager.addItems(communityClusterItems);
-                    communityClusterManager.getMarkerCollection().showAll();
-                    communityClusterManager.cluster();
+//                    communityClusterManager.addItems(communityClusterItems);
+//                    communityClusterManager.getMarkerCollection().showAll();
+//                    communityClusterManager.cluster();
                 } else {
                     communityClusterManager.getMarkerCollection().hideAll();
                     communityClusterManager.clearItems();
@@ -739,6 +739,17 @@ public class SearchForFishActivity extends AppCompatActivity implements OnMapRea
                                 }
 
                             }
+
+                            // TODO: Handler (Main Looper)
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    communityClusterManager.addItems(communityClusterItems);
+                                    communityClusterManager.getMarkerCollection().showAll();
+                                    communityClusterManager.cluster();
+                                }
+                            });
+
                         }
 
                         @Override
