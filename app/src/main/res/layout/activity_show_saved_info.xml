@@ -47,7 +47,8 @@
 
             <TextView
                 android:id="@+id/tvCatchTitleInfoSave"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:text=""
                 android:textSize="24sp" />
@@ -69,7 +70,8 @@
 
             <TextView
                 android:id="@+id/tvUserInfoSave"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="24sp" />
@@ -91,7 +93,8 @@
 
             <TextView
                 android:id="@+id/tvFishNameInfoSave"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="24sp" />
@@ -112,7 +115,8 @@
 
             <TextView
                 android:id="@+id/tvLocationInfoSave"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="24sp" />
@@ -133,7 +137,8 @@
 
             <TextView
                 android:id="@+id/tvLikesInfoSave"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="24sp" />
@@ -154,7 +159,8 @@
 
             <TextView
                 android:id="@+id/tvVetsInfoSave"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="24sp" />
@@ -183,7 +189,8 @@
 
             <ListView
                 android:id="@+id/lvCommentsSave"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="185dp" />
         </TableRow>
 
